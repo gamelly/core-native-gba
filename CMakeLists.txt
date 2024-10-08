@@ -39,12 +39,12 @@ gba_create_rom(${PROJECT_NAME}
 set(ZIG_VERSION "0.13.0")
 set(ZIG_DOWNLOAD "http://ziglang.org/download")
 set(ZIG_PATH "${CMAKE_SOURCE_DIR}/vendor/zig/zig")
+string(TOLOWER ${CMAKE_HOST_SYSTEM_NAME} CMAKE_HOST_SYSTEM_NAME_LOWER)
 if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Darwin")
     set(ZIG_DOWNLOAD "${ZIG_DOWNLOAD}/${ZIG_VERSION}/zig-macos-${CMAKE_HOST_SYSTEM_PROCESSOR}-${ZIG_VERSION}.tar.xz")
 elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux")
     set(ZIG_DOWNLOAD "${ZIG_DOWNLOAD}/${ZIG_VERSION}/zig-linux-${CMAKE_HOST_SYSTEM_PROCESSOR}-${ZIG_VERSION}.tar.xz")
 elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
-    add_compile_options("-DNOT_USE_GETOPT")
     set(ZIG_DOWNLOAD "${ZIG_DOWNLOAD}/${ZIG_VERSION}/zig-windows-${CMAKE_HOST_SYSTEM_PROCESSOR}-${ZIG_VERSION}.zip")
 endif()
 if(NOT EXISTS ${ZIG_PATH})
@@ -59,19 +59,20 @@ endif()
 find_program(ZIGC zig PATHS "${CMAKE_SOURCE_DIR}/vendor/zig" REQUIRED NO_DEFAULT_PATH)
 
 # Lua
+set(LUA_VERSION "5.4.7")
+set(LUA_DOWNLOAD "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz")
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/vendor/lua/lua")
-    FetchContent_Declare(
-        lib_lua
-        GIT_REPOSITORY https://github.com/lua/lua
-        GIT_TAG v5.4.7
+    FetchContent_Populate(
+        compiler_lua
+        URL "${LUA_DOWNLOAD}"
         SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/lua"
         SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/lua-subbuild"
         BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/lua-build"
     )
-    FetchContent_MakeAvailable(lib_lua)
     execute_process(
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/lua"
         COMMAND ${ZIGC} cc -DMAKE_LUA onelua.c -o lua
+            -target ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME_LOWER}
     )
 endif()
 file(GLOB lua_files "${CMAKE_SOURCE_DIR}/vendor/lua/*.c")
