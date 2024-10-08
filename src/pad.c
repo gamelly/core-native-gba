@@ -4,16 +4,16 @@ static uint16_t keys_current = 0;
 static uint16_t keys_old = 0;
 
 static const char *const key_bindings[] = {
-    "red",
-    "green",
+    "a",
+    "b",
     "menu",
     "menu",
     "left",
     "right",
     "down",
     "up",
-    "yellow",
-    "blue"
+    "c",
+    "d"
 };
 
 static void key_update(lua_State* L, const char *const key, int value)
