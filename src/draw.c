@@ -1,20 +1,23 @@
 #include "core_native_gba.h"
 
-union {
+union color_u {
     uint16_t pixel;
     uint32_t pixel2;
     uint16_t arr[2];
-} color_current = {0};
-
-union {
-    uint32_t pixel;
     struct {
         uint8_t a;
-        uint8_t b;
-        uint8_t g;
         uint8_t r;
+        uint8_t g;
+        uint8_t b;
     } c;
-} color_conversor = {0};
+};
+
+static uint16_t draw_index_erase = 0;
+static uint16_t draw_index_push = 0;
+static uint16_t draw_queue[4096];
+
+static union color_u color_tint = {0};
+static union color_u color_erase = {0};
 
 static int native_draw_start(lua_State *L)
 {
@@ -25,17 +28,6 @@ static int native_draw_flush(lua_State *L)
 {
     return 0;
 }
-/**
- * @short @c std.draw.color
- * @param[in] color @c int
- */
-static int native_draw_color(lua_State *L) {
-    color_conversor.pixel = luaL_checkinteger(L, 1);
-    color_current.pixel = (color_conversor.c.r << 10 | color_conversor.c.g << 5 | color_conversor.c.b);
-    color_current.arr[1] = color_current.pixel;
-    lua_pop(L, 1);
-    return 0;
-}
 
 /**
  * @short @c std.draw.clear
@@ -43,15 +35,22 @@ static int native_draw_color(lua_State *L) {
  */
 static int native_draw_clear(lua_State *L)
 {
-    native_draw_color(L);
+    color_erase.pixel = luaL_checkinteger(L, 1);
+    color_erase.pixel = (color_erase.c.r << 10 | color_erase.c.g << 5 | color_erase.c.b);
+    color_erase.arr[1] = color_erase.pixel;
+    lua_pop(L, 1);
+    return 0;
+}
 
-    static const uint32_t *end = (uint32_t *) (0x06000000 + (240 * 160 * 2));
-    uint32_t *i = (uint32_t *) 0x06000000;
-
-    while (i < end) {
-        *i++ = color_current.pixel2;
-    }
-
+/**
+ * @short @c std.draw.color
+ * @param[in] color @c int
+ */
+static int native_draw_color(lua_State *L) {
+    color_tint.pixel = luaL_checkinteger(L, 1);
+    color_tint.pixel = (color_tint.c.r << 10 | color_tint.c.g << 5 | color_tint.c.b);
+    color_tint.arr[1] = color_tint.pixel;
+    lua_pop(L, 1);
     return 0;
 }
 
@@ -65,16 +64,12 @@ static int native_draw_clear(lua_State *L)
  */
 static int native_draw_rect(lua_State *L)
 {
-    short x = luaL_checknumber(L, 2);
-    short y = luaL_checknumber(L, 3);
-    short w = luaL_checknumber(L, 4);
-    short h = luaL_checknumber(L, 5);
-
-    for (int i = 0; i < h; i++) {
-        for (int j = 0; j < w; j++) {
-            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = color_current.pixel;
-        }
+    uint8_t i = 0;
+    while (i < 5) {
+        draw_queue[draw_index_push + i] = luaL_checknumber(L, i + 1);
+        i++;
     }
+    draw_index_push += 5;
 
     lua_pop(L, 5);
 
@@ -112,6 +107,33 @@ static int native_draw_font(lua_State *L)
 static int native_draw_text(lua_State *L)
 {
    return 0;
+}
+
+void native_draw_update_flush(uint8_t flushmode)
+{
+    draw_index_erase = 0;
+    uint16_t color = flushmode? color_tint.pixel: color_erase.pixel;
+
+    while(draw_index_erase < draw_index_push) {
+        draw_index_erase++;
+        uint16_t x = draw_queue[draw_index_erase++];
+        uint16_t y = draw_queue[draw_index_erase++];
+        uint16_t w = draw_queue[draw_index_erase++];
+        uint16_t h = draw_queue[draw_index_erase++];
+
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = color;
+            }
+        }
+    }  
+}
+
+void native_draw_update_queue(lua_State *L)
+{
+    draw_index_push = 0;
+    lua_getglobal(L, "native_callback_draw");
+    lua_pcall(L, 0, 0, 0);
 }
 
 void native_draw_install(lua_State* L)

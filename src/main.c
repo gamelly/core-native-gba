@@ -26,13 +26,13 @@ int main()
 
     while (1) {
         native_pad_update(L);
-        lua_getglobal(L, "native_callback_loop");
-        lua_pushnumber(L, 16);
-        lua_pcall(L, 1, 0, 0);
+        native_loop_update(L);
         while(*(volatile uint16_t*) 0x04000006 >= 160);
         while(*(volatile uint16_t*) 0x04000006 < 160);
-        lua_getglobal(L, "native_callback_draw");
-        lua_pcall(L, 0, 0, 0);
+        native_draw_update_flush(0);
+        native_draw_update_queue(L);
+        native_draw_update_flush(1);
+        
     }
 
     return 0;
