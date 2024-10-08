@@ -1,8 +1,4 @@
 #include <gba.h>
-#include <gba_console.h>
-#include <gba_video.h>
-#include <gba_interrupt.h>
-#include <gba_systemcalls.h>
 
 #include "engine/bytecode.h"
 #include "game/bytecode.h"
@@ -29,6 +25,7 @@ int main()
     lua_pcall(L, 3, 0, 0);
 
     while (1) {
+        native_pad_update(L);
         lua_getglobal(L, "native_callback_loop");
         lua_pushnumber(L, 16);
         lua_pcall(L, 1, 0, 0);

@@ -65,7 +65,6 @@ static int native_draw_clear(lua_State *L)
  */
 static int native_draw_rect(lua_State *L)
 {
-    uint16_t *videoBuffer = (uint16_t *)0x06000000;
     short x = luaL_checknumber(L, 2);
     short y = luaL_checknumber(L, 3);
     short w = luaL_checknumber(L, 4);
@@ -73,7 +72,7 @@ static int native_draw_rect(lua_State *L)
 
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
-            videoBuffer[(y + i) * 240 + (x + j)] = color_current.pixel;
+            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = color_current.pixel;
         }
     }
 
