@@ -1,29 +1,38 @@
 #include <gba.h>
 
-#ifndef RGB15
-#define RGB15(r, g, b) (((r) << 10) | ((g) << 5) | (b))
-#endif
+#include "engine/bytecode.h"
+#include "game/bytecode.h"
 
-void drawSquare(int x, int y, int size, u16 color) {
-    u16 *videoBuffer = (u16 *)VRAM;
+#include "core_native_gba.h"
 
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            videoBuffer[(y + i) * 240 + (x + j)] = color;
-        }
-    }
-}
-
-int main() {
+int main()
+{
     SetMode(MODE_3 | BG2_ENABLE);
+    lua_State *L;
+    L = luaL_newstate();
+    luaL_openlibs(L);
+    native_draw_install(L);
 
-    
-    u16 redColor = RGB15(31, 0, 0);
+    luaL_loadbuffer(L, engine_bytecode_lua, engine_bytecode_lua_len, "");
+	lua_pcall(L, 0, 0, 0);
 
-    drawSquare(50, 50, 40, redColor);
+    lua_getglobal(L, "native_callback_init");
+    lua_pushnumber(L, 240);
+    lua_pushnumber(L, 160);
+
+    luaL_loadbuffer(L, game_bytecode_lua, game_bytecode_lua_len, "");
+	lua_pcall(L, 0, 1, 0);
+    lua_pcall(L, 3, 0, 0);
 
     while (1) {
-        VBlankIntrWait();
+        native_pad_update(L);
+        native_loop_update(L);
+        while(*(volatile uint16_t*) 0x04000006 >= 160);
+        while(*(volatile uint16_t*) 0x04000006 < 160);
+        native_draw_update_flush(0);
+        native_draw_update_queue(L);
+        native_draw_update_flush(1);
+        
     }
 
     return 0;
