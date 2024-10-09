@@ -4,14 +4,22 @@
 
 ## How to build
 
-```bash
+ * i will recommend using the [devkitpro/devkitarm](https://hub.docker.com/r/devkitpro/devkitarm) container if you do not have [devkitpro](https://devkitpro.org/wiki/devkitPro_pacman) installed.
+ 
+```
 git clone https://github.com/gamelly/core-native-gba
 ```
 
-```bash
-cmake -Bbuild -H. -DGAME=/path/to/my/game.lua
+```
+cmake -Bbuild -H. -DGAME=/vendor/engine/examples/pong/game.lua
 ```
 
 ```bash
 make -C build
+```
+
+## Run
+
+```
+VisualBoyAdvance build/GBA_Game.gba
 ```
