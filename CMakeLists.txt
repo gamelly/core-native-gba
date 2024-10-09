@@ -61,7 +61,10 @@ find_program(ZIGC zig PATHS "${CMAKE_SOURCE_DIR}/vendor/zig" REQUIRED NO_DEFAULT
 # Lua
 set(LUA_VERSION "5.4.7")
 set(LUA_DOWNLOAD "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz")
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/vendor/lua/lua")
+set(LUA_PATH "${CMAKE_SOURCE_DIR}/vendor/lua")
+set(LUA_OPTMIZE FALSE)
+if(NOT EXISTS "${LUA_PATH}/lua")
+    set(LUA_OPTMIZE TRUE)
     FetchContent_Populate(
         compiler_lua
         URL "${LUA_DOWNLOAD}"
@@ -115,6 +118,15 @@ if(DEFINED GAME AND GAME_LENGTH)
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
         COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${GAME} ${GAME_HEADER} --const --name game_bytecode_lua
         COMMAND_ERROR_IS_FATAL
+    )
+endif()
+
+# Lua perfomance
+if(LUA_OPTMIZE)
+    execute_process(
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
+        COMMAND ${LUAC} src/cli/main.lua fs-replace ${LUA_PATH}/luaconf.h ${LUA_PATH}/luaconf.h
+            --format "#define%sLUA_32BITS%s%d" --replace "#define LUA_32BITS 1"
     )
 endif()
 
