@@ -16,8 +16,9 @@ static uint16_t draw_index_erase = 0;
 static uint16_t draw_index_push = 0;
 static uint16_t draw_queue[4096];
 
-static union color_u color_tint = {0};
-static union color_u color_erase = {0};
+static union color_u color_tint = {0xFF};
+static union color_u color_erase = {0x0FF0};
+static union color_u color_current = {0x00FF};
 
 static int native_draw_start(lua_State *L)
 {
@@ -27,6 +28,21 @@ static int native_draw_start(lua_State *L)
 static int native_draw_flush(lua_State *L)
 {
     return 0;
+}
+
+static void queue_push(lua_State *L, uint8_t func) {
+    uint8_t i = 1;
+    uint8_t j = lua_gettop(L) + 1;
+
+    draw_queue[draw_index_push] = func;
+
+    while (i < j) {
+        draw_queue[draw_index_push + i] = luaL_checknumber(L, i);
+        i++;
+    }
+
+    draw_index_push += j;
+    lua_pop(L, j);
 }
 
 /**
@@ -64,16 +80,23 @@ static int native_draw_color(lua_State *L) {
  */
 static int native_draw_rect(lua_State *L)
 {
-    uint8_t i = 0;
-    while (i < 5) {
-        draw_queue[draw_index_push + i] = luaL_checknumber(L, i + 1);
-        i++;
-    }
-    draw_index_push += 5;
-
-    lua_pop(L, 5);
-
+    queue_push(L, 0);
     return 0;
+}
+
+static void native_draw_rect_flush()
+{
+    uint8_t mode = draw_queue[draw_index_erase++];
+    uint16_t x = draw_queue[draw_index_erase++];
+    uint16_t y = draw_queue[draw_index_erase++];
+    uint16_t w = draw_queue[draw_index_erase++];
+    uint16_t h = draw_queue[draw_index_erase++];
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = color_current.pixel;
+        }
+    }
 }
 
 /**
@@ -85,7 +108,38 @@ static int native_draw_rect(lua_State *L)
  */
 static int native_draw_line(lua_State *L)
 {
+    queue_push(L, 1);
     return 0;
+}
+
+static void native_draw_line_flush()
+{
+    uint16_t x1 = draw_queue[draw_index_erase++];
+    uint16_t y1 = draw_queue[draw_index_erase++];
+    uint16_t x2 = draw_queue[draw_index_erase++];
+    uint16_t y2 = draw_queue[draw_index_erase++];
+    uint16_t aux;
+    if (x2 < x1) {
+        aux = x2;
+        x1 = x2;
+        x2 = aux;
+    }
+    if (y2 < y1) {
+        aux = y2;
+        y1 = y2;
+        y2 = aux;
+    }
+
+    while (x1 < x2 || y1 < y2) {
+        *(uint16_t *)(0x06000000 + ((y1 * 240) + x1) * 2) = color_current.pixel;
+
+        if (x1 < x2) {
+            x1++;
+        }
+        if (y1 < y2) {
+            y1++;
+        }
+    }
 }
 
 /**
@@ -111,21 +165,17 @@ static int native_draw_text(lua_State *L)
 
 void native_draw_update_flush(uint8_t flushmode)
 {
+    uint8_t func = 0;
     draw_index_erase = 0;
-    uint16_t color = flushmode? color_tint.pixel: color_erase.pixel;
+    color_current.pixel2 = flushmode? color_tint.pixel2: color_erase.pixel2;
+
+    static const void (*geometry_draw[])() = {
+        native_draw_rect_flush,
+        native_draw_line_flush
+    };
 
     while(draw_index_erase < draw_index_push) {
-        draw_index_erase++;
-        uint16_t x = draw_queue[draw_index_erase++];
-        uint16_t y = draw_queue[draw_index_erase++];
-        uint16_t w = draw_queue[draw_index_erase++];
-        uint16_t h = draw_queue[draw_index_erase++];
-
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = color;
-            }
-        }
+        geometry_draw[draw_queue[draw_index_erase++]]();
     }  
 }
 
