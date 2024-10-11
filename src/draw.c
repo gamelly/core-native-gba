@@ -2,6 +2,8 @@
 
 extern void draw_color(lua_State *L, union color_u *);
 extern void draw_queue_push(lua_State *L, uint8_t);
+extern void text_queue_push(lua_State *L, uint8_t);
+extern void text_queue_clear();
 
 union color_u color_tint = {0xFF};
 union color_u color_erase = {0x0FF0};
@@ -9,6 +11,7 @@ union color_u color_current = {0x00FF};
 
 static int native_draw_start(lua_State *L)
 {
+    text_queue_clear();
     return 0;
 }
 
@@ -82,7 +85,8 @@ static int native_draw_font(lua_State *L)
  */
 static int native_draw_text(lua_State *L)
 {
-   return 0;
+    text_queue_push(L, 2);
+    return 2;
 }
 
 void native_draw_install(lua_State* L)

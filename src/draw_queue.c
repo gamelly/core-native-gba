@@ -2,6 +2,7 @@
 
 extern void native_draw_rect_flush();
 extern void native_draw_line_flush();
+extern void native_draw_text_flush();
 
 uint16_t draw_index_erase = 0;
 uint16_t draw_index_push = 0;
@@ -30,7 +31,8 @@ void native_draw_update_flush(uint8_t flushmode)
 
     static const void (*geometry_draw[])() = {
         native_draw_rect_flush,
-        native_draw_line_flush
+        native_draw_line_flush,
+        native_draw_text_flush
     };
 
     while(draw_index_erase < draw_index_push) {

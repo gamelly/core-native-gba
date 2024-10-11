@@ -58,6 +58,18 @@ if(NOT EXISTS ${ZIG_PATH})
 endif()
 find_program(ZIGC zig PATHS "${CMAKE_SOURCE_DIR}/vendor/zig" REQUIRED NO_DEFAULT_PATH)
 
+# Font
+set(FONT_DOWNLOAD "https://github.com/gamelly/gly-type/archive/refs/heads/main.zip")
+if(NOT EXISTS "${LUA_PATH}/font")
+    FetchContent_Populate(
+        lib_font
+        URL "${FONT_DOWNLOAD}"
+        SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/font"
+        SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/font-subbuild"
+        BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/font-build"
+    )
+endif()
+
 # Lua
 set(LUA_VERSION "5.4.7")
 set(LUA_DOWNLOAD "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz")
