@@ -1,14 +1,10 @@
 # Core Native GBA
 
-> create your own game-engine with just lua for game boy advance.
-
-[<img align="right" height="100px" src="https://raw.githubusercontent.com/RodrigoDornelles/RodrigoDornelles/refs/heads/master/media/pong-gba-gly-engine.gif">](#core-native-gba)
-
-This project is a basic micro-gameengine to run lua in the **Nintendo GBA**,
+This project is a basic micro-gameengine to run lua in the **Nintendo Game Boy Advanced**,
 which can be expanded to a custom engine,
 such as [Gly Engine](https://github.com/gamelly/gly-engine).
 
-<br/><br/>
+[<img height="168px" src="https://raw.githubusercontent.com/RodrigoDornelles/RodrigoDornelles/refs/heads/master/media/pong-gba-gly-engine.gif">](#core-native-gba)
 
 | :warning: Attention |
 | :------------------ |
