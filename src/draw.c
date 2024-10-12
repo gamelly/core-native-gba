@@ -25,6 +25,8 @@ static int native_draw_flush(lua_State *L)
 /**
  * @short @c std.draw.clear
  * @param[in] color @c int
+ * @warning Changing the color that is clearing the screen is expensive,
+ * it will take 2 to 3 frames, so avoid changing the color constantly.
  */
 static int native_draw_clear(lua_State *L)
 {
@@ -73,6 +75,9 @@ static int native_draw_line(lua_State *L)
  * @short @c std.draw.font
  * @param[in] font @c string
  * @param[in] size @c double
+ * @warning long texts are currently expensive and impact vertical synchronization,
+ * if you happen to experience flickering, change @b FPS_MODE to @b 3
+ * or focus on smaller texts and at the bottom of the screen.
  */
 static int native_draw_font(lua_State *L)
 {
