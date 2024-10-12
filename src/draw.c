@@ -1,7 +1,9 @@
 #include "core_native_gba.h"
 
 extern void draw_color(lua_State *L, union color_u *);
+extern void text_font_size(lua_State *L);
 extern void draw_queue_push(lua_State *L, uint8_t);
+extern void text_font_size(lua_State *L);
 extern void text_queue_push(lua_State *L, uint8_t);
 extern void text_queue_clear();
 
@@ -74,7 +76,8 @@ static int native_draw_line(lua_State *L)
  */
 static int native_draw_font(lua_State *L)
 {
-   return 0;
+    text_font_size(L);
+    return 0;
 }
 
 /**

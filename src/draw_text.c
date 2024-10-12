@@ -1,12 +1,24 @@
 #include "core_native_gba.h"
 #include "font/gly_type_render.h"
 
+static uint8_t font_size = 5;
 static uint8_t text_page1_index = 0;
 static uint8_t text_page2_index = 0;
 static const char* texts_page1[20];
 static const char* texts_page2[20];
 
 void native_draw_line_func(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+void text_font_size(lua_State *L)
+{
+    uint8_t top = lua_gettop(L);
+    if (top == 1) {
+        font_size = (uint8_t) luaL_checknumber(L, 1);
+    } else {
+        font_size = (uint8_t) luaL_checknumber(L, 2);
+    }
+    lua_pop(L, top);
+}
 
 void text_queue_push(lua_State *L, uint8_t func) {
     const char* text = NULL;
@@ -57,5 +69,5 @@ void native_draw_text_flush()
     } else {
         text = texts_page2[draw_queue[draw_index_erase++]];
     }
-    gly_type_render(x, y, 5, text, native_draw_line_func);
+    gly_type_render(x, y, font_size, text, native_draw_line_func);
 }
