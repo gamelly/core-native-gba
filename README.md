@@ -8,7 +8,7 @@ such as [Gly Engine](https://github.com/gamelly/gly-engine).
 
 | :warning: Attention |
 | :------------------ |
-| there is no sanitization, error handling or observation of resource consumption, all of this takes up precious CPU time, bad code will make the game crash with a black screen. I recommend multiplatform games that support desktop especially for testing! |
+| there is no sanitization, error handling or observation of resource consumption, all of this takes up precious CPU time, bad code will make the game crash with a black screen.<br><br>**I recommend made a multiplatform game that support desktop especially for testing lua code!** |
 
 ## How to build
 
