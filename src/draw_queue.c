@@ -5,8 +5,10 @@ extern void native_draw_line_flush();
 extern void native_draw_text_flush();
 
 uint16_t draw_index_erase = 0;
+uint16_t draw_page1_index = 0;
+uint16_t draw_page2_index = 0;
 uint16_t draw_index_push = 0;
-uint16_t draw_queue[4096];
+uint8_t draw_queue[8192];
 
 void draw_queue_push(lua_State *L, uint8_t func) {
     uint8_t i = 1;
@@ -23,10 +25,24 @@ void draw_queue_push(lua_State *L, uint8_t func) {
     lua_pop(L, j);
 }
 
-void native_draw_update_flush(uint8_t flushmode)
+/**
+ * @li @b 0: clear page 1
+ * @li @b 1: color page 1
+ * @li @b 2: clear page 2
+ * @li @b 3: color page 2
+ * @li @b 4: erase page 1
+ * @li @b 5: erase page 2
+ */
+void native_draw_update_flush(uint8_t flushmode, uint8_t page)
 {
-    uint8_t func = 0;
-    draw_index_erase = 0;
+    if (page & 1) {
+        draw_index_push = draw_page2_index;
+        draw_index_erase = sizeof(draw_queue)/2;
+    } else {
+        draw_index_push = draw_page1_index;
+        draw_index_erase = 0;
+    }
+
     color_current.pixel2 = flushmode? color_tint.pixel2: color_erase.pixel2;
 
     static const void (*geometry_draw[])() = {
@@ -40,9 +56,14 @@ void native_draw_update_flush(uint8_t flushmode)
     }  
 }
 
-void native_draw_update_queue(lua_State *L)
+void native_draw_update_queue(lua_State *L, uint8_t page)
 {
-    draw_index_push = 0;
+    draw_index_push = page & 1? sizeof(draw_queue)/2: 0;
     lua_getglobal(L, "native_callback_draw");
     lua_pcall(L, 0, 0, 0);
+    if (page & 1) {
+        draw_page2_index = draw_index_push;
+    } else {
+        draw_page1_index = draw_index_push;
+    }
 }

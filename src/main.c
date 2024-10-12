@@ -24,15 +24,17 @@ int main()
 	lua_pcall(L, 0, 1, 0);
     lua_pcall(L, 3, 0, 0);
 
+    uint8_t frameskip = 0;
+    uint8_t page = 0;
+    
     while (1) {
         native_pad_update(L);
         native_loop_update(L);
+        native_draw_update_queue(L, page++);
         while(*(volatile uint16_t*) 0x04000006 >= 160);
         while(*(volatile uint16_t*) 0x04000006 < 160);
-        native_draw_update_flush(0);
-        native_draw_update_queue(L);
-        native_draw_update_flush(1);
-        
+        native_draw_update_flush(COLOR_ERASE, page++);
+        native_draw_update_flush(COLOR_TINT, page++);
     }
 
     return 0;
