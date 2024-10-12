@@ -25,7 +25,6 @@ static void key_update(lua_State* L, const char *const key, uint8_t value)
 }
 
 /**
- * @todo investigate is correct: buttons like pullup.
  * @li 1 released
  * @li 0 pressing
  */

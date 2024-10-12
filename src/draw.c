@@ -1,7 +1,12 @@
 #include "core_native_gba.h"
 
+extern void erase_screen();
 extern void draw_color(lua_State *L, union color_u *);
+extern void text_font_size(lua_State *L);
 extern void draw_queue_push(lua_State *L, uint8_t);
+extern void text_font_size(lua_State *L);
+extern void text_queue_push(lua_State *L, uint8_t);
+extern void text_queue_clear();
 
 union color_u color_tint = {0xFF};
 union color_u color_erase = {0x0FF0};
@@ -9,6 +14,7 @@ union color_u color_current = {0x00FF};
 
 static int native_draw_start(lua_State *L)
 {
+    text_queue_clear();
     return 0;
 }
 
@@ -20,10 +26,17 @@ static int native_draw_flush(lua_State *L)
 /**
  * @short @c std.draw.clear
  * @param[in] color @c int
+ * @warning Changing the color that is clearing the screen is expensive,
+ * it will take 2 to 3 frames, so avoid changing the color constantly.
  */
 static int native_draw_clear(lua_State *L)
 {
+    static uint32_t old_color = 0xFACADA;
     draw_color(L, &color_erase);
+    if (old_color != color_erase.pixel2) {
+        old_color = color_erase.pixel2;
+        erase_screen();
+    }
     return 0;
 }
 
@@ -68,10 +81,14 @@ static int native_draw_line(lua_State *L)
  * @short @c std.draw.font
  * @param[in] font @c string
  * @param[in] size @c double
+ * @warning long texts are currently expensive and impact vertical synchronization,
+ * if you happen to experience flickering, change @b FPS_MODE to @b 3
+ * or focus on smaller texts and at the bottom of the screen.
  */
 static int native_draw_font(lua_State *L)
 {
-   return 0;
+    text_font_size(L);
+    return 0;
 }
 
 /**
@@ -82,7 +99,8 @@ static int native_draw_font(lua_State *L)
  */
 static int native_draw_text(lua_State *L)
 {
-   return 0;
+    text_queue_push(L, 2);
+    return 2;
 }
 
 void native_draw_install(lua_State* L)

@@ -58,6 +58,18 @@ if(NOT EXISTS ${ZIG_PATH})
 endif()
 find_program(ZIGC zig PATHS "${CMAKE_SOURCE_DIR}/vendor/zig" REQUIRED NO_DEFAULT_PATH)
 
+# Font
+set(FONT_DOWNLOAD "https://github.com/gamelly/gly-type/archive/refs/heads/main.zip")
+if(NOT EXISTS "${LUA_PATH}/font")
+    FetchContent_Populate(
+        lib_font
+        URL "${FONT_DOWNLOAD}"
+        SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/font"
+        SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/font-subbuild"
+        BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/font-build"
+    )
+endif()
+
 # Lua
 set(LUA_VERSION "5.4.7")
 set(LUA_DOWNLOAD "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz")
@@ -112,6 +124,9 @@ endif()
 string(LENGTH "${GAME}" GAME_LENGTH)
 set(GAME_HEADER "${CMAKE_SOURCE_DIR}/vendor/game/bytecode.h")
 if(DEFINED GAME AND GAME_LENGTH)
+    if(NOT EXISTS ${GAME})
+        message(FATAL_ERROR "game not found: ${GAME}")
+    endif()
     get_filename_component(GAME "${GAME}" ABSOLUTE)
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/game")
     execute_process(
@@ -128,6 +143,11 @@ if(LUA_OPTMIZE)
         COMMAND ${LUAC} src/cli/main.lua fs-replace ${LUA_PATH}/luaconf.h ${LUA_PATH}/luaconf.h
             --format "#define%sLUA_32BITS%s%d" --replace "#define LUA_32BITS 1"
     )
+endif()
+
+# Define 
+if(FPS_MODE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE GLY_GBA_FPSMODE=${FPS_MODE})
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${GBA_STANDARD_LIBRARIES})
