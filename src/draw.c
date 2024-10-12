@@ -1,5 +1,6 @@
 #include "core_native_gba.h"
 
+extern void erase_screen();
 extern void draw_color(lua_State *L, union color_u *);
 extern void text_font_size(lua_State *L);
 extern void draw_queue_push(lua_State *L, uint8_t);
@@ -30,7 +31,12 @@ static int native_draw_flush(lua_State *L)
  */
 static int native_draw_clear(lua_State *L)
 {
+    static uint32_t old_color = 0xFACADA;
     draw_color(L, &color_erase);
+    if (old_color != color_erase.pixel2) {
+        old_color = color_erase.pixel2;
+        erase_screen();
+    }
     return 0;
 }
 
