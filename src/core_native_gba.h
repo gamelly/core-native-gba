@@ -31,7 +31,7 @@ void native_draw_update_queue(lua_State* L, uint8_t page);
 void native_draw_update_flush(uint8_t flushmode, uint8_t page);
 
 // loop
-void native_loop_update(lua_State* L);
+void native_loop_update(lua_State* L, uint8_t dt);
 
 // pad
 void native_pad_update(lua_State *L);

@@ -142,6 +142,11 @@ if(LUA_OPTMIZE)
     )
 endif()
 
+# Define 
+if(FPS_MODE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE GLY_GBA_FPSMODE=${FPS_MODE})
+endif()
+
 target_link_libraries(${PROJECT_NAME} ${GBA_STANDARD_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} lua-static)
 target_link_libraries(${PROJECT_NAME} m)
