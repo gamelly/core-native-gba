@@ -52,8 +52,8 @@ if(NOT EXISTS ${ZIG_PATH})
         compiler_zig
         URL "${ZIG_DOWNLOAD}"
         SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/zig"
-        SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/zig-subbuild"
-        BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/zig-build"
+        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/zig-subbuild"
+        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/zig-build"
     )
 endif()
 find_program(ZIGC zig PATHS "${CMAKE_SOURCE_DIR}/vendor/zig" REQUIRED NO_DEFAULT_PATH)
@@ -65,8 +65,8 @@ if(NOT EXISTS "${LUA_PATH}/font")
         lib_font
         URL "${FONT_DOWNLOAD}"
         SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/font"
-        SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/font-subbuild"
-        BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/font-build"
+        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/font-subbuild"
+        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/font-build"
     )
 endif()
 
@@ -81,8 +81,8 @@ if(NOT EXISTS "${LUA_PATH}/lua")
         compiler_lua
         URL "${LUA_DOWNLOAD}"
         SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/lua"
-        SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/lua-subbuild"
-        BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/lua-build"
+        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/lua-subbuild"
+        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/lua-build"
     )
     execute_process(
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/lua"
@@ -97,15 +97,16 @@ add_library(lua-static STATIC "${lua_files}")
 find_program(LUAC lua PATHS "${CMAKE_SOURCE_DIR}/vendor/lua" REQUIRED NO_DEFAULT_PATH)
 
 # Engine
+set(ENGINE_VERSION "0.0.10")
+set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
 set(ENGINE_HEADER "${CMAKE_SOURCE_DIR}/vendor/engine/bytecode.h")
 if(NOT EXISTS ${ENGINE_HEADER})
     FetchContent_Declare(
         lib_engine
-        GIT_REPOSITORY https://github.com/gamelly/gly-engine
-        GIT_TAG develop
+        URL "${ENGINE_DOWNLOAD}"
         SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine"
-        SUBBUILD_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/engine-subbuild"
-        BINARY_DIR "${CMAKE_BINARY_DIR}/CMakeFiles/_deps/engine-build"
+        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/engine-subbuild"
+        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/engine-build"
     )
     FetchContent_MakeAvailable(lib_engine)
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine/dist")
@@ -140,14 +141,8 @@ endif()
 if(LUA_OPTMIZE)
     execute_process(
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
-        COMMAND ${LUAC} src/cli/main.lua fs-replace ${LUA_PATH}/luaconf.h ${LUA_PATH}/luaconf.h
-            --format "#define%sLUA_32BITS%s%d" --replace "#define LUA_32BITS 1"
+        COMMAND ${LUAC} src/cli/main.lua fs-luaconf ${LUA_PATH}/luaconf.h --32bits
     )
-endif()
-
-# Define 
-if(FPS_MODE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE GLY_GBA_FPSMODE=${FPS_MODE})
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${GBA_STANDARD_LIBRARIES})

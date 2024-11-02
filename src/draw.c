@@ -1,20 +1,11 @@
 #include "core_native_gba.h"
 
-extern void erase_screen();
-extern void draw_color(lua_State *L, union color_u *);
-extern void text_font_size(lua_State *L);
-extern void draw_queue_push(lua_State *L, uint8_t);
-extern void text_font_size(lua_State *L);
-extern void text_queue_push(lua_State *L, uint8_t);
-extern void text_queue_clear();
-
 union color_u color_tint = {0xFF};
 union color_u color_erase = {0x0FF0};
 union color_u color_current = {0x00FF};
 
 static int native_draw_start(lua_State *L)
 {
-    text_queue_clear();
     return 0;
 }
 
@@ -23,87 +14,65 @@ static int native_draw_flush(lua_State *L)
     return 0;
 }
 
-/**
- * @short @c std.draw.clear
- * @param[in] color @c int
- * @warning Changing the color that is clearing the screen is expensive,
- * it will take 2 to 3 frames, so avoid changing the color constantly.
- */
 static int native_draw_clear(lua_State *L)
 {
-    static uint32_t old_color = 0xFACADA;
-    draw_color(L, &color_erase);
-    if (old_color != color_erase.pixel2) {
-        old_color = color_erase.pixel2;
-        erase_screen();
-    }
+    draw_queue_push(48, 3, 0, 1, 0);
+    draw_queue_push(49, 0, 0, 0, 0);
+    lua_settop(L, 0);
     return 0;
 }
 
-/**
- * @short @c std.draw.color
- * @param[in] color @c int
- */
 static int native_draw_color(lua_State *L)
 {
-    draw_color(L, &color_tint);
+    draw_queue_push(48, 0, 0, 1, 0);
+    draw_queue_push(49, 0xFF, 0xFF, 0xFF, 0xFF);
+    lua_settop(L, 0);
     return 0;
 }
 
-/**
- * @short @c std.draw.rect
- * @param[in] mode @c int 0 fill, 1 frame
- * @param[in] x @c double pos X
- * @param[in] y @c double pos Y
- * @param[in] w @c double width
- * @param[in] h @c double height
- */
 static int native_draw_rect(lua_State *L)
 {
-    draw_queue_push(L, 0);
+    uint8_t mode = luaL_checkinteger(L, 1);
+    uint8_t posx = luaL_checknumber(L, 2);
+    uint8_t posy = luaL_checknumber(L, 3);
+    uint8_t width = luaL_checknumber(L, 4);
+    uint8_t height = luaL_checknumber(L, 5);
+    draw_queue_push(48, mode, 0, 1, 0);
+    draw_queue_push(50, posx, posy, width, height);
+    lua_settop(L, 0);
     return 0;
 }
 
-/**
- * @short @c std.draw.line
- * @param[in] x1 @c double
- * @param[in] y1 @c double
- * @param[in] x2 @c double
- * @param[in] y2 @c double
- */
 static int native_draw_line(lua_State *L)
 {
-    draw_queue_push(L, 1);
+    uint8_t x1 = luaL_checknumber(L, 1);
+    uint8_t y1 = luaL_checknumber(L, 2);
+    uint8_t x2 = luaL_checknumber(L, 3);
+    uint8_t y2 = luaL_checknumber(L, 4);
+    draw_queue_push(51, x1, y1, x2, y2);
+    lua_settop(L, 0);
     return 0;
 }
 
-/**
- * @short @c std.draw.font
- * @param[in] font @c string
- * @param[in] size @c double
- * @warning long texts are currently expensive and impact vertical synchronization,
- * if you happen to experience flickering, change @b FPS_MODE to @b 3
- * or focus on smaller texts and at the bottom of the screen.
- */
 static int native_draw_font(lua_State *L)
 {
-    text_font_size(L);
+    lua_settop(L, 0);
     return 0;
 }
 
-/**
- * @short @c std.draw.text
- * @param[in] x @c double
- * @param[in] y @c double
- * @param[in] text @c string
- */
 static int native_draw_text(lua_State *L)
 {
-    text_queue_push(L, 2);
+    lua_settop(L, 2);
     return 2;
 }
 
-void native_draw_install(lua_State* L)
+void draw_callback_update(lua_State* L)
+{
+    lua_getglobal(L, "native_callback_draw");
+    lua_pcall(L, 0, 0, 0);
+}
+
+void draw_library_install(lua_State* L)
 {
     int i = 0;
     static const luaL_Reg lib[] = {

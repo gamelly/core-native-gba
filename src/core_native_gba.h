@@ -11,24 +11,36 @@ union color_u {
     uint32_t pixel2;
     uint16_t arr[2];
     struct {
-        uint8_t a;
-        uint8_t b;
-        uint8_t g;
-        uint8_t r;
-    } c;
+        struct {
+            uint16_t b: 5; 
+            uint16_t g: 5; 
+            uint16_t r: 5;
+            uint16_t a: 1;
+        } color;
+    } c16;
+    struct {
+        struct {
+            uint8_t a;
+            uint8_t b;
+            uint8_t g;
+            uint8_t r;
+        } color;
+    } c32;
 };
 
-extern union color_u color_tint;
-extern union color_u color_erase;
-extern union color_u color_current;
+extern uint8_t draw_mode;
+extern union color_u draw_color;
 
-extern uint16_t draw_index_erase;
-extern uint16_t draw_index_push;
-extern uint8_t draw_queue[8192];
+void draw_cmd_mode(uint8_t, uint8_t, uint8_t, uint8_t);
+void draw_cmd_color(uint8_t, uint8_t, uint8_t, uint8_t);
+void draw_cmd_rect(uint8_t, uint8_t, uint8_t, uint8_t);
+void draw_cmd_line(uint8_t, uint8_t, uint8_t, uint8_t);
+void draw_queue_burn(uint8_t page);
+void draw_queue_page(uint8_t page);
+void draw_queue_push(uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 
-void native_draw_install(lua_State* L);
-void native_draw_update_queue(lua_State* L, uint8_t page);
-void native_draw_update_flush(uint8_t flushmode, uint8_t page);
+void draw_library_install(lua_State* L);
+void draw_callback_update(lua_State* L);
 
 // loop
 void native_loop_update(lua_State* L, uint8_t dt);

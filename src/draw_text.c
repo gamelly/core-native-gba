@@ -1,6 +1,6 @@
 #include "core_native_gba.h"
 #include "font/gly_type_render.h"
-
+/*
 static uint8_t font_size = 5;
 static uint8_t text_page1_index = 0;
 static uint8_t text_page2_index = 0;
@@ -71,3 +71,4 @@ void native_draw_text_flush()
     }
     gly_type_render(x, y, font_size, text, native_draw_line_func);
 }
+*/

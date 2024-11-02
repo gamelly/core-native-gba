@@ -1,69 +1,65 @@
 #include "core_native_gba.h"
 
-extern void native_draw_rect_flush();
-extern void native_draw_line_flush();
-extern void native_draw_text_flush();
+static uint16_t index_cmd = 0;
+static uint16_t page1_cmd = 0;
+static uint16_t page2_cmd = 0;
+static uint16_t index_param = 0;
+static uint16_t page_current = 0;
 
-uint16_t draw_index_erase = 0;
-uint16_t draw_page1_index = 0;
-uint16_t draw_page2_index = 0;
-uint16_t draw_index_push = 0;
-uint8_t draw_queue[8192];
+static uint8_t queue_command[2048];
+static uint8_t queue_param[8192];
 
-void draw_queue_push(lua_State *L, uint8_t func) {
-    uint8_t i = 1;
-    uint8_t j = lua_gettop(L) + 1;
-
-    draw_queue[draw_index_push] = func;
-
-    while (i < j) {
-        draw_queue[draw_index_push + i] = luaL_checknumber(L, i);
-        i++;
+void draw_queue_push(uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{
+    if (index_cmd < sizeof(queue_command) && index_param + 4 <= sizeof(queue_param)) {
+        queue_command[index_cmd++] = cmd;
+        queue_param[index_param++] = a;
+        queue_param[index_param++] = b;
+        queue_param[index_param++] = c;
+        queue_param[index_param++] = d;
     }
-
-    draw_index_push += j;
-    lua_pop(L, j);
 }
 
-/**
- * @li @b 0: clear page 1
- * @li @b 1: color page 1
- * @li @b 2: clear page 2
- * @li @b 3: color page 2
- * @li @b 4: erase page 1
- * @li @b 5: erase page 2
- */
-void native_draw_update_flush(uint8_t flushmode, uint8_t page)
+void draw_queue_page(uint8_t page)
 {
-    if (page & 1) {
-        draw_index_push = draw_page2_index;
-        draw_index_erase = sizeof(draw_queue)/2;
+    page_current = page & 1;
+    if (page_current) {
+        page1_cmd = index_cmd;
+        index_cmd = sizeof(queue_command) / 2;
+        index_param = sizeof(queue_param) / 2;
     } else {
-        draw_index_push = draw_page1_index;
-        draw_index_erase = 0;
+        page2_cmd = index_cmd;
+        index_cmd = 0;
+        index_param = 0;
+    }
+}
+
+void draw_queue_burn(uint8_t page)
+{
+    uint16_t index = page & 1? sizeof(queue_command)/2: 0;
+    uint16_t param = index * 4;
+    uint16_t final = index_cmd;
+
+    if ((page & 1) != page_current) {
+        final = index == 0? page1_cmd: page2_cmd;
     }
 
-    color_current.pixel2 = flushmode? color_tint.pixel2: color_erase.pixel2;
-
-    static const void (*geometry_draw[])() = {
-        native_draw_rect_flush,
-        native_draw_line_flush,
-        native_draw_text_flush
+    static const void (*commands[])(uint8_t, uint8_t, uint8_t, uint8_t) = {
+        draw_cmd_mode,
+        draw_cmd_color,
+        draw_cmd_rect,
+        draw_cmd_line
     };
 
-    while(draw_index_erase < draw_index_push) {
-        geometry_draw[draw_queue[draw_index_erase++]]();
-    }  
-}
-
-void native_draw_update_queue(lua_State *L, uint8_t page)
-{
-    draw_index_push = page & 1? sizeof(draw_queue)/2: 0;
-    lua_getglobal(L, "native_callback_draw");
-    lua_pcall(L, 0, 0, 0);
-    if (page & 1) {
-        draw_page2_index = draw_index_push;
-    } else {
-        draw_page1_index = draw_index_push;
+    while (index < final) {
+        uint8_t cmd = queue_command[index] - 48;
+        if (cmd < sizeof(commands) / sizeof(commands[0]) && commands[cmd] != NULL) {
+            uint8_t param_1 = queue_param[param++];
+            uint8_t param_2 = queue_param[param++];
+            uint8_t param_3 = queue_param[param++];
+            uint8_t param_4 = queue_param[param++];
+            commands[cmd](param_1, param_2, param_3, param_4);
+        }
+        index++;
     }
 }
