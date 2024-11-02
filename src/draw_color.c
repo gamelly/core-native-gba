@@ -1,10 +1,10 @@
 #include "core_native_gba.h"
 
 static uint8_t flush_mode;
-static union color_u tint = {0xFF00};
-static union color_u clear = {0x0FFF};
+static color_t tint = {0xFF00};
+static color_t clear = {0x0FFF};
 
-union color_u draw_color = {0x00FF};
+color_t draw_color = {0x00FF};
 uint8_t draw_mode;
 
 void draw_cmd_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
@@ -13,12 +13,10 @@ void draw_cmd_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
         tint.c16.color.r = r;
         tint.c16.color.g = g;
         tint.c16.color.b = b;
-        tint.c16.color.a = 0;
     } else {
         clear.c16.color.r = r;
         clear.c16.color.g = g;
         clear.c16.color.b = b;
-        clear.c16.color.a = 0;
     }
 
     if (flush_mode) {

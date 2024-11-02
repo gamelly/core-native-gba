@@ -9,6 +9,19 @@ static uint16_t page_current = 0;
 static uint8_t queue_command[2048];
 static uint8_t queue_param[8192];
 
+static uint8_t clojure_cmd;
+
+static void draw_cmd_clojure(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{
+    draw_queue_push(clojure_cmd, a, b, c, d);
+}
+
+cmd_t draw_queue_clojure(uint8_t cmd)
+{
+    clojure_cmd = cmd;
+    return draw_cmd_clojure;
+}
+
 void draw_queue_push(uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {
     if (index_cmd < sizeof(queue_command) && index_param + 4 <= sizeof(queue_param)) {
@@ -44,7 +57,7 @@ void draw_queue_burn(uint8_t page)
         final = index == 0? page1_cmd: page2_cmd;
     }
 
-    static const void (*commands[])(uint8_t, uint8_t, uint8_t, uint8_t) = {
+    static const cmd_t commands[] = {
         draw_cmd_mode,
         draw_cmd_color,
         draw_cmd_rect,
