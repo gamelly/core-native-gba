@@ -14,11 +14,13 @@ void draw_logo()
     draw_queue_push(48, 3, 0, 1, 0);
     draw_queue_push(49, 0, 0, 0, 0);
 #if ENGINE_LOGO == 1
+    draw_queue_push(50, 90, 45, 50, 45);
     gly_type_render(95, 60, 12, "gly", draw_queue_clojure(51));
 #else
     gly_type_render(95, 67, 5, "native", draw_queue_clojure(51));
 #endif
     gly_type_render(95, 74, 5, "engine", draw_queue_clojure(51));
+    gly_type_render(97, 80, 4, "0.0.10", draw_queue_clojure(51));
     draw_queue_burn(1);
 #endif
 }
