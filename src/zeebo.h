@@ -45,9 +45,5 @@ cmd_t draw_queue_clojure(uint8_t cmd);
 
 void draw_library_install(lua_State* L);
 void draw_callback_update(lua_State* L);
-
-// loop
-void native_loop_update(lua_State* L, uint8_t dt);
-
-// pad
-void native_pad_update(lua_State *L);
+void keys_callback_update(lua_State *L);
+void loop_callback_update(lua_State* L, uint8_t dt);

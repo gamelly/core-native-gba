@@ -34,8 +34,8 @@ int main()
     static uint8_t page = 0;
     
     while (1) {
-        native_pad_update(L);
-        native_loop_update(L, 16);
+        keys_callback_update(L);
+        loop_callback_update(L, 32);
         draw_queue_page(page++);
         draw_callback_update(L);
         while(*(volatile uint16_t*) 0x04000006 >= 160);

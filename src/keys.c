@@ -28,7 +28,7 @@ static void key_update(lua_State* L, const char *const key, uint8_t value)
  * @li 1 released
  * @li 0 pressing
  */
-void native_pad_update(lua_State* L)
+void keys_callback_update(lua_State* L)
 {
     uint16_t mask = 1;
     uint8_t i = 0;
