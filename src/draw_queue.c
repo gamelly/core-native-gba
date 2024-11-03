@@ -24,7 +24,7 @@ cmd_t draw_queue_clojure(uint8_t cmd)
 
 void draw_queue_push(uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {
-    if (index_cmd < sizeof(queue_command) && index_param + 4 <= sizeof(queue_param)) {
+    if (index_cmd < sizeof(queue_command)) {
         queue_command[index_cmd++] = cmd;
         queue_param[index_param++] = a;
         queue_param[index_param++] = b;
