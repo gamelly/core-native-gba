@@ -145,6 +145,5 @@ if(LUA_OPTMIZE)
     )
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${GBA_STANDARD_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} lua-static)
 target_link_libraries(${PROJECT_NAME} m)

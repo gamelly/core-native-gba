@@ -1,13 +1,18 @@
-#include <gba.h>
-
 #include "engine/bytecode.h"
 #include "game/bytecode.h"
 
 #include "core_native_gba.h"
 
+/**
+ * @li @b REG_DISPCNT @c 0x4000000
+ * @li @b REG_VCOUNT @c 0x4000006
+ * @li @b MODE_3 @c 0x3
+ * @li @b BG2_ENABLE @c 0x400
+ */
 int main()
 {
-    SetMode(MODE_3 | BG2_ENABLE);
+    (*(volatile uint32_t*)0x4000000) = 0x3 | 0x400;
+
     lua_State *L;
     L = luaL_newstate();
     luaL_openlibs(L);
