@@ -1,7 +1,7 @@
 #include "engine/bytecode.h"
 #include "game/bytecode.h"
 
-#include "core_native_gba.h"
+#include "zeebo.h"
 
 /**
  * @li @b REG_DISPCNT @c 0x4000000

@@ -1,4 +1,4 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 
 static uint16_t keys_current = 0;
 static uint16_t keys_old = 0;

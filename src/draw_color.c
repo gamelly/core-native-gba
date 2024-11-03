@@ -1,4 +1,4 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 
 static uint8_t flush_mode;
 static color_t tint = {0xFF00};

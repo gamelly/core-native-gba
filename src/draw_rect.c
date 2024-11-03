@@ -1,4 +1,4 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 
 void draw_cmd_rect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {

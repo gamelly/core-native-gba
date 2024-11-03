@@ -1,4 +1,4 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 
 void native_loop_update(lua_State* L, uint8_t dt)
 {

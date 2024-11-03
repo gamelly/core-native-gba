@@ -1,4 +1,4 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 #include "font/gly_type_render.h"
 
 static uint8_t font_size = 0;

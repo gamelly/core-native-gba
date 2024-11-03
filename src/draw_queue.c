@@ -1,4 +1,4 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 
 static uint16_t index_cmd = 0;
 static uint16_t page1_cmd = 0;
