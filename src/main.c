@@ -13,6 +13,8 @@ int main()
 {
     (*(volatile uint32_t*)0x4000000) = 0x3 | 0x400;
 
+    draw_logo();
+
     lua_State *L;
     L = luaL_newstate();
     luaL_openlibs(L);

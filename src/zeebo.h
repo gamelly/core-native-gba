@@ -32,6 +32,8 @@ typedef union {
 extern uint8_t draw_mode;
 extern color_t draw_color;
 
+void draw_logo();
+
 void draw_cmd_mode(uint8_t, uint8_t, uint8_t, uint8_t);
 void draw_cmd_color(uint8_t, uint8_t, uint8_t, uint8_t);
 void draw_cmd_rect(uint8_t, uint8_t, uint8_t, uint8_t);
