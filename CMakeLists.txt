@@ -97,29 +97,31 @@ add_library(lua-static STATIC "${lua_files}")
 find_program(LUAC lua PATHS "${CMAKE_SOURCE_DIR}/vendor/lua" REQUIRED NO_DEFAULT_PATH)
 
 # Engine
+set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
 set(ENGINE_VERSION "0.0.10")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
-set(ENGINE_HEADER "${CMAKE_SOURCE_DIR}/vendor/engine/bytecode.h")
+set(ENGINE_HEADER "${ENGINE_DIR}/bytecode.h")
 if(NOT EXISTS ${ENGINE_HEADER})
     FetchContent_Declare(
         lib_engine
         URL "${ENGINE_DOWNLOAD}"
-        SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine"
+        SOURCE_DIR ${ENGINE_DIR}
         SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/engine-subbuild"
         BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/engine-build"
     )
     FetchContent_MakeAvailable(lib_engine)
-    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine/dist")
-    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/example/template")
+    file(MAKE_DIRECTORY "${ENGINE_DIR}/lite")
+    file(MAKE_DIRECTORY "${ENGINE_DIR}/full")
+    file(MAKE_DIRECTORY "${ENGINE_DIR}/examples/template")
     execute_process(
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
+        WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua build --core native --bundler
     )
     execute_process(
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
-        COMMAND ${LUAC} src/cli/main.lua tool-template-fill examples/template/game.lua 204800
+        WORKING_DIRECTORY ${ENGINE_DIR}
+        COMMAND ${LUAC} src/cli/main.lua tool-template-fill ${ENGINE_DIR}/examples/template/game.lua 204800
     )
-    set(ENGINE "${CMAKE_SOURCE_DIR}/vendor/engine/dist/main.lua")
+    set(ENGINE "${ENGINE_DIR}/dist/main.lua")
 endif()
 if(DEFINED ENGINE)
     if(NOT EXISTS ${ENGINE})
@@ -127,7 +129,7 @@ if(DEFINED ENGINE)
     endif()
     get_filename_component(ENGINE "${ENGINE}" ABSOLUTE)
     execute_process(
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
+        WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${ENGINE} ${ENGINE_HEADER} --const --name engine_bytecode_lua
         COMMAND_ERROR_IS_FATAL ANY
     )
@@ -138,10 +140,11 @@ string(LENGTH "${GAME}" GAME_LENGTH)
 set(GAME_HEADER "${CMAKE_SOURCE_DIR}/vendor/game/bytecode.h")
 if (DEFINED GAME AND GAME_LENGTH AND GAME MATCHES "^\\@")
     string(SUBSTRING "${GAME}" 1 -1 GAME)
-    set(GAME "${CMAKE_SOURCE_DIR}/vendor/engine/examples/${GAME}/game.lua")
+    set(GAME "${ENGINE_DIR}/examples/${GAME}/game.lua")
 endif()
 if ((NOT DEFINED GAME AND NOT EXISTS ${GAME_HEADER}) OR (DEFINED GAME AND NOT GAME_LENGTH))
-    file(WRITE ${GAME_HEADER} "const unsigned char* game_bytecode_lua = NULL;\nconst unsigned int game_bytecode_lua_len = 0;")
+    set(GAME "${ENGINE_DIR}/examples/template/game.lua")
+    set(GAME_LENGTH 1)
 endif()
 if(DEFINED GAME AND GAME_LENGTH)
     if(NOT EXISTS ${GAME})
@@ -150,7 +153,7 @@ if(DEFINED GAME AND GAME_LENGTH)
     get_filename_component(GAME "${GAME}" ABSOLUTE)
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/game")
     execute_process(
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
+        WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${GAME} ${GAME_HEADER} --const --name game_bytecode_lua
         COMMAND_ERROR_IS_FATAL ANY
     )
@@ -159,7 +162,7 @@ endif()
 # Lua perfomance
 if(LUA_OPTMIZE)
     execute_process(
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
+        WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua fs-luaconf ${LUA_PATH}/luaconf.h --32bits
     )
 endif()

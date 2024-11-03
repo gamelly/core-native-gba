@@ -22,14 +22,8 @@ git clone https://github.com/gamelly/core-native-gba
 
 ### Configure project
 
- * **GAME:** path to your `game.lua`<br/><sup><sub>(can also be an example from the **vendor/engine/examples** folder)</sub></sup>
- * **FPS_MODE 0:** loop 60 fps / draw 60 fps
- * **FPS_MODE 1:** loop 60 fps / draw 30 fps
- * **FPS_MODE 2:** loop 30 fps / draw 30 fps
- * **FPS_MODE 3:** loop 20 fps / draw 20 fps
-
 ```
-cmake -Bbuild -H. -DGAME=vendor/engine/examples/pong/game.lua -DFPS_MODE=1
+cmake -Bbuild -H. -DGAME=vendor/engine/examples/pong/game.lua
 ```
 
 ### Build cartbridge rom `.gba`
