@@ -27,8 +27,7 @@ PLANTUML_INCLUDE_PATH  =
 OUTPUT_LANGUAGE        = English
 FILE_PATTERNS          = *.c *.h
 EXTENSION_MAPPING      = h=c 
-INPUT                  = README.md src
-USE_MDFILE_AS_MAINPAGE = README.md
+INPUT                  = src
 MARKDOWN_ID_STYLE      = GITHUB
 # Theme: https://jothepro.github.io/doxygen-awesome-css/
 GENERATE_TREEVIEW      = YES
