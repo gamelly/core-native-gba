@@ -28,11 +28,11 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 gba_create_rom(${PROJECT_NAME}
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.gba"
-    TITLE "Meu Jogo GBA"
-    GAMECODE "MEJG"
-    MAKERCODE "ABCD"
+    TITLE "Gly Engine"
+    GAMECODE "GLYE"
+    MAKERCODE "GLYE"
     VERSION "1.0"
-    DEBUG "1"
+    DEBUG "0"
 )
 
 # Zig
@@ -110,20 +110,39 @@ if(NOT EXISTS ${ENGINE_HEADER})
     )
     FetchContent_MakeAvailable(lib_engine)
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine/dist")
+    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/example/template")
     execute_process(
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
         COMMAND ${LUAC} src/cli/main.lua build --core native --bundler
     )
     execute_process(
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
-        COMMAND ${LUAC} src/cli/main.lua fs-xxd-i dist/main.lua bytecode.h --const --name engine_bytecode_lua
-        COMMAND_ERROR_IS_FATAL
+        COMMAND ${LUAC} src/cli/main.lua tool-template-fill examples/template/game.lua 204800
+    )
+    set(ENGINE "${CMAKE_SOURCE_DIR}/vendor/engine/dist/main.lua")
+endif()
+if(DEFINED ENGINE)
+    if(NOT EXISTS ${ENGINE})
+        message(FATAL_ERROR "engine not found: ${ENGINE}")
+    endif()
+    get_filename_component(ENGINE "${ENGINE}" ABSOLUTE)
+    execute_process(
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
+        COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${ENGINE} ${ENGINE_HEADER} --const --name engine_bytecode_lua
+        COMMAND_ERROR_IS_FATAL ANY
     )
 endif()
 
 # Game
 string(LENGTH "${GAME}" GAME_LENGTH)
 set(GAME_HEADER "${CMAKE_SOURCE_DIR}/vendor/game/bytecode.h")
+if (DEFINED GAME AND GAME_LENGTH AND GAME MATCHES "^\\@")
+    string(SUBSTRING "${GAME}" 1 -1 GAME)
+    set(GAME "${CMAKE_SOURCE_DIR}/vendor/engine/examples/${GAME}/game.lua")
+endif()
+if ((NOT DEFINED GAME AND NOT EXISTS ${GAME_HEADER}) OR (DEFINED GAME AND NOT GAME_LENGTH))
+    file(WRITE ${GAME_HEADER} "const unsigned char* game_bytecode_lua = NULL;\nconst unsigned int game_bytecode_lua_len = 0;")
+endif()
 if(DEFINED GAME AND GAME_LENGTH)
     if(NOT EXISTS ${GAME})
         message(FATAL_ERROR "game not found: ${GAME}")
@@ -133,7 +152,7 @@ if(DEFINED GAME AND GAME_LENGTH)
     execute_process(
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/engine"
         COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${GAME} ${GAME_HEADER} --const --name game_bytecode_lua
-        COMMAND_ERROR_IS_FATAL
+        COMMAND_ERROR_IS_FATAL ANY
     )
 endif()
 
