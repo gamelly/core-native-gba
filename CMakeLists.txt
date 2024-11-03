@@ -115,15 +115,23 @@ if(NOT EXISTS ${ENGINE_HEADER})
     file(MAKE_DIRECTORY "${ENGINE_DIR}/examples/template")
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua build --core native --bundler
+        COMMAND ${LUAC} src/cli/main.lua build --core lite --bundler --dist ${ENGINE_DIR}/lite/
+    )
+    execute_process(
+        WORKING_DIRECTORY ${ENGINE_DIR}
+        COMMAND ${LUAC} src/cli/main.lua build --core native --bundler --dist ${ENGINE_DIR}/native/
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua tool-template-fill ${ENGINE_DIR}/examples/template/game.lua 204800
     )
-    set(ENGINE "${ENGINE_DIR}/dist/main.lua")
+    set(ENGINE "@native")
 endif()
 if(DEFINED ENGINE)
+    if (ENGINE MATCHES "^\\@")
+        string(SUBSTRING "${ENGINE}" 1 -1 ENGINE)
+        set(ENGINE "${ENGINE_DIR}/${ENGINE}/main.lua")
+    endif()
     if(NOT EXISTS ${ENGINE})
         message(FATAL_ERROR "engine not found: ${ENGINE}")
     endif()
