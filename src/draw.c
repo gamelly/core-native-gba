@@ -88,6 +88,16 @@ static int native_draw_text_tui(lua_State *L) {
     return 0;
 }
 
+static int native_draw_image(lua_State *L) {
+    uint8_t x = luaL_checknumber(L, 2);
+    uint8_t y = luaL_checknumber(L, 3);
+    draw_queue_push(48, 0, 0, 1, 0);
+    draw_queue_push(49, 0XFF, 0xFF, 0xFF, 0);
+    draw_queue_push(50, x, y, 1, 1);
+    lua_settop(L, 0);
+    return 0;
+}
+
 void draw_callback_update(lua_State* L)
 {
     lua_getglobal(L, "native_callback_draw");
@@ -107,6 +117,7 @@ void draw_library_install(lua_State* L)
         {"native_draw_font", native_draw_font},
         {"native_draw_text", native_draw_text},
         {"native_draw_text_tui", native_draw_text_tui},
+        {"native_draw_image", native_draw_image}
     };
 
     while(i < sizeof(lib)/sizeof(luaL_Reg)) {
