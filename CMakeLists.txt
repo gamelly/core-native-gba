@@ -25,9 +25,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${GBA_LINKER_FLAGS}")
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 add_executable(${PROJECT_NAME} ${SOURCES})
-
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 gba_create_rom(${PROJECT_NAME}
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.gba"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/bin/game.gba"
     TITLE "Gly Engine"
     GAMECODE "GLYE"
     MAKERCODE "GLYE"
@@ -98,7 +98,7 @@ find_program(LUAC lua PATHS "${CMAKE_SOURCE_DIR}/vendor/lua" REQUIRED NO_DEFAULT
 
 # Engine
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
-set(ENGINE_VERSION "0.0.10")
+set(ENGINE_VERSION "0.0.11")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
 set(ENGINE_HEADER "${ENGINE_DIR}/bytecode.h")
 if(NOT EXISTS ${ENGINE_HEADER})
@@ -111,21 +111,23 @@ if(NOT EXISTS ${ENGINE_HEADER})
     )
     FetchContent_MakeAvailable(lib_engine)
     file(MAKE_DIRECTORY "${ENGINE_DIR}/lite")
-    file(MAKE_DIRECTORY "${ENGINE_DIR}/full")
+    file(MAKE_DIRECTORY "${ENGINE_DIR}/native")
     file(MAKE_DIRECTORY "${ENGINE_DIR}/examples/template")
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua build --core lite --bundler --dist ${ENGINE_DIR}/lite/
+        COMMAND_ERROR_IS_FATAL ANY
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua build --core native --bundler --dist ${ENGINE_DIR}/native/
+        COMMAND_ERROR_IS_FATAL ANY
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} src/cli/main.lua tool-template-fill ${ENGINE_DIR}/examples/template/game.lua 204800
     )
-    set(ENGINE "@native")
+    set(ENGINE "@lite")
 endif()
 if(DEFINED ENGINE)
     if (ENGINE MATCHES "^\\@")
