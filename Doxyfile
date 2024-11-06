@@ -1,7 +1,7 @@
 # Custom Configs
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Core Native GBA"
-PROJECT_NUMBER         = 0.0.7
+PROJECT_NUMBER         = 0.0.11
 PROJECT_BRIEF          = "create your own game-engine with just lua for nitendo game boy advance console."
 PROJECT_LOGO           = 
 OUTPUT_DIRECTORY       = .
@@ -27,8 +27,7 @@ PLANTUML_INCLUDE_PATH  =
 OUTPUT_LANGUAGE        = English
 FILE_PATTERNS          = *.c *.h
 EXTENSION_MAPPING      = h=c 
-INPUT                  = README.md src
-USE_MDFILE_AS_MAINPAGE = README.md
+INPUT                  = src
 MARKDOWN_ID_STYLE      = GITHUB
 # Theme: https://jothepro.github.io/doxygen-awesome-css/
 GENERATE_TREEVIEW      = YES

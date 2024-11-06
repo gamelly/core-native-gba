@@ -1,30 +1,24 @@
-#include <gba.h>
-
 #include "engine/bytecode.h"
 #include "game/bytecode.h"
 
-#include "core_native_gba.h"
+#include "zeebo.h"
 
-#ifndef GLY_GBA_FPSMODE
 /**
- * @short fps configure
- * @brief lower FPS in heavier games ensures frame stability.
- * @details use flag @c -DFPS_MODE=0 in cmake to configure frameskip.
- * @li @b 0 loop 60 fps / draw 60 fps
- * @li @b 1 loop 60 fps / draw 30 fps
- * @li @b 2 loop 30 fps / draw 30 fps
- * @li @b 3 loop 20 fps / draw 20 fps
+ * @li @b REG_DISPCNT @c 0x4000000
+ * @li @b REG_VCOUNT @c 0x4000006
+ * @li @b MODE_3 @c 0x3
+ * @li @b BG2_ENABLE @c 0x400
  */
-#define GLY_GBA_FPSMODE 0
-#endif
-
 int main()
 {
-    SetMode(MODE_3 | BG2_ENABLE);
+    (*(volatile uint32_t*)0x4000000) = 0x3 | 0x400;
+
+    draw_logo();
+
     lua_State *L;
     L = luaL_newstate();
     luaL_openlibs(L);
-    native_draw_install(L);
+    draw_library_install(L);
 
     luaL_loadbuffer(L, engine_bytecode_lua, engine_bytecode_lua_len, "");
 	lua_pcall(L, 0, 0, 0);
@@ -37,58 +31,23 @@ int main()
 	lua_pcall(L, 0, 1, 0);
     lua_pcall(L, 3, 0, 0);
 
-    uint8_t frameskip = 0;
-    uint8_t page = 0;
+    static uint8_t page = 0;
+    static uint8_t frameskip = 0;
     
     while (1) {
-#if GLY_GBA_FPSMODE == 0
-        native_pad_update(L);
-        native_loop_update(L, 16);
-        native_draw_update_queue(L, page++);
-        while(*(volatile uint16_t*) 0x04000006 >= 160);
-        while(*(volatile uint16_t*) 0x04000006 < 160);
-        native_draw_update_flush(COLOR_ERASE, page++);
-        native_draw_update_flush(COLOR_TINT, page++);
-#elif GLY_GBA_FPSMODE == 1
-        native_pad_update(L);
-        native_loop_update(L, 16);
+        keys_callback_update(L);
+        loop_callback_update(L, 16);
         while(*(volatile uint16_t*) 0x04000006 >= 160);
         while(*(volatile uint16_t*) 0x04000006 < 160);
         if (++frameskip & 1) {
-            native_draw_update_queue(L, page++);
+            draw_queue_page(page++);
+            draw_callback_update(L);
         } else {
-            native_draw_update_flush(COLOR_ERASE, page++);
-            native_draw_update_flush(COLOR_TINT, page++);
+            draw_cmd_mode(0, 1, 0, 1);
+            draw_queue_burn(page++);
+            draw_cmd_mode(0, 0, 0, 1);
+            draw_queue_burn(page++);
         }
-#elif GLY_GBA_FPSMODE == 3
-        if (++frameskip & 1) {
-            native_pad_update(L);
-            native_loop_update(L, 32);
-            native_draw_update_queue(L, page++);
-        }
-        else {
-            native_draw_update_flush(COLOR_ERASE, page++);
-            native_draw_update_flush(COLOR_TINT, page++);
-        }
-        while(*(volatile uint16_t*) 0x04000006 >= 160);
-        while(*(volatile uint16_t*) 0x04000006 < 160);
-#elif GLY_GBA_FPSMODE == 4
-        if (++frameskip == 1) {
-            native_pad_update(L);
-            native_loop_update(L, 48);
-        }
-        else if (frameskip == 2) {
-            native_draw_update_queue(L, page++);
-        }
-        else if (frameskip == 3) {
-            native_draw_update_flush(COLOR_ERASE, page++);
-            native_draw_update_flush(COLOR_TINT, page++);
-            frameskip = 0;
-        }
-        while(*(volatile uint16_t*) 0x04000006 >= 160);
-        while(*(volatile uint16_t*) 0x04000006 < 160);
-#endif
     }
-
     return 0;
 }

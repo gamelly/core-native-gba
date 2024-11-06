@@ -1,32 +1,26 @@
-#include "core_native_gba.h"
+#include "zeebo.h"
 
-void native_draw_rect_flush()
+void draw_cmd_rect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-    uint8_t mode = draw_queue[draw_index_erase++];
-    uint16_t x = draw_queue[draw_index_erase++];
-    uint16_t y = draw_queue[draw_index_erase++];
-    uint16_t w = draw_queue[draw_index_erase++];
-    uint16_t h = draw_queue[draw_index_erase++];
-
-    if (mode) {
+    if (draw_mode) {
         for (int i = 0; i < w; i++) {
-            *(uint16_t *)(0x06000000 + ((y) * 240 + (x + i)) * 2) = color_current.pixel;
+            *(uint16_t *)(0x06000000 + ((y) * 240 + (x + i)) * 2) = draw_color.pixel;
         }
         for (int i = 0; i <= w; i++) {
-            *(uint16_t *)(0x06000000 + ((y + h) * 240 + (x + i)) * 2) = color_current.pixel;
+            *(uint16_t *)(0x06000000 + ((y + h) * 240 + (x + i)) * 2) = draw_color.pixel;
         }
         for (int i = 0; i < h; i++) {
-            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x)) * 2) = color_current.pixel;
+            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x)) * 2) = draw_color.pixel;
         }
         for (int i = 0; i < h; i++) {
-            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + w)) * 2) = color_current.pixel;
+            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + w)) * 2) = draw_color.pixel;
         }
         return;
     }
 
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
-            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = color_current.pixel;
+            *(uint16_t *)(0x06000000 + ((y + i) * 240 + (x + j)) * 2) = draw_color.pixel;
         }
     }
 }
