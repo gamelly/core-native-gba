@@ -37,8 +37,8 @@ gba_create_rom(${PROJECT_NAME}
 
 # Zig
 set(ZIG_VERSION "0.13.0")
+set(ZIG_DIR "${CMAKE_SOURCE_DIR}/vendor/zig")
 set(ZIG_DOWNLOAD "http://ziglang.org/download")
-set(ZIG_PATH "${CMAKE_SOURCE_DIR}/vendor/zig/zig")
 string(TOLOWER ${CMAKE_HOST_SYSTEM_NAME} CMAKE_HOST_SYSTEM_NAME_LOWER)
 if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Darwin")
     set(ZIG_DOWNLOAD "${ZIG_DOWNLOAD}/${ZIG_VERSION}/zig-macos-${CMAKE_HOST_SYSTEM_PROCESSOR}-${ZIG_VERSION}.tar.xz")
@@ -47,85 +47,63 @@ elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux")
 elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
     set(ZIG_DOWNLOAD "${ZIG_DOWNLOAD}/${ZIG_VERSION}/zig-windows-${CMAKE_HOST_SYSTEM_PROCESSOR}-${ZIG_VERSION}.zip")
 endif()
-if(NOT EXISTS ${ZIG_PATH})
-    FetchContent_Populate(
-        compiler_zig
-        URL "${ZIG_DOWNLOAD}"
-        SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/zig"
-        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/zig-subbuild"
-        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/zig-build"
-    )
+if(NOT EXISTS ${ZIG_DIR})
+    FetchContent_Populate(dep_zig URL ${ZIG_DOWNLOAD} SOURCE_DIR ${ZIG_DIR})
 endif()
-find_program(ZIGC zig PATHS "${CMAKE_SOURCE_DIR}/vendor/zig" REQUIRED NO_DEFAULT_PATH)
+find_program(ZIGC zig PATHS ${ZIG_DIR} REQUIRED NO_DEFAULT_PATH)
 
 # Font
-set(FONT_DOWNLOAD "https://github.com/gamelly/gly-type/archive/refs/heads/main.zip")
-if(NOT EXISTS "${LUA_PATH}/font")
-    FetchContent_Populate(
-        lib_font
-        URL "${FONT_DOWNLOAD}"
-        SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/font"
-        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/font-subbuild"
-        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/font-build"
-    )
+set(FONT_VERSION "0.1")
+set(FONT_DIR "${CMAKE_SOURCE_DIR}/vendor/font")
+set(FONT_DOWNLOAD "https://github.com/gamelly/gly-type/archive/refs/tags/${FONT_VERSION}.tar.gz")
+if(NOT EXISTS ${FONT_DIR})
+    FetchContent_Populate(dep_font URL ${FONT_DOWNLOAD} SOURCE_DIR ${FONT_DIR})
 endif()
 
 # Lua
 set(LUA_VERSION "5.4.7")
+set(LUA_DIR "${CMAKE_SOURCE_DIR}/vendor/lua")
 set(LUA_DOWNLOAD "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz")
-set(LUA_PATH "${CMAKE_SOURCE_DIR}/vendor/lua")
 set(LUA_OPTMIZE FALSE)
 if(NOT EXISTS "${LUA_PATH}/lua")
     set(LUA_OPTMIZE TRUE)
-    FetchContent_Populate(
-        compiler_lua
-        URL "${LUA_DOWNLOAD}"
-        SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/lua"
-        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/lua-subbuild"
-        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/lua-build"
-    )
+    FetchContent_Populate(dep_lua URL "${LUA_DOWNLOAD}" SOURCE_DIR ${LUA_DIR})
     execute_process(
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/lua"
+        WORKING_DIRECTORY ${LUA_DIR}
         COMMAND ${ZIGC} cc -DMAKE_LUA onelua.c -o lua
             -target ${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME_LOWER}
     )
 endif()
-file(GLOB lua_files "${CMAKE_SOURCE_DIR}/vendor/lua/*.c")
-list(REMOVE_ITEM lua_files "${CMAKE_SOURCE_DIR}/vendor/lua/lua.c")
-list(REMOVE_ITEM lua_files "${CMAKE_SOURCE_DIR}/vendor/lua/onelua.c")
-add_library(lua-static STATIC "${lua_files}")
-find_program(LUAC lua PATHS "${CMAKE_SOURCE_DIR}/vendor/lua" REQUIRED NO_DEFAULT_PATH)
+file(GLOB lua_files "${LUA_DIR}/*.c")
+list(REMOVE_ITEM lua_files "${LUA_DIR}/lua.c")
+list(REMOVE_ITEM lua_files "${LUA_DIR}/onelua.c")
+add_library(lua-static STATIC ${lua_files})
+find_program(LUAC lua PATHS ${LUA_DIR} REQUIRED NO_DEFAULT_PATH)
 
 # Engine
+set(ENGINE_VERSION "0.0.12")
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
-set(ENGINE_VERSION "0.0.11")
+set(ENGINE_CLI "${ENGINE_DIR}/src/cli/main.lua")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
 set(ENGINE_HEADER "${ENGINE_DIR}/bytecode.h")
 if(NOT EXISTS ${ENGINE_HEADER})
-    FetchContent_Declare(
-        lib_engine
-        URL "${ENGINE_DOWNLOAD}"
-        SOURCE_DIR ${ENGINE_DIR}
-        SUBBUILD_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/engine-subbuild"
-        BINARY_DIR "${CMAKE_SOURCE_DIR}/vendor/_deps/engine-build"
-    )
-    FetchContent_MakeAvailable(lib_engine)
+    FetchContent_Populate(dep_engine URL ${ENGINE_DOWNLOAD} SOURCE_DIR ${ENGINE_DIR})
     file(MAKE_DIRECTORY "${ENGINE_DIR}/lite")
     file(MAKE_DIRECTORY "${ENGINE_DIR}/native")
     file(MAKE_DIRECTORY "${ENGINE_DIR}/examples/template")
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua build --core lite --bundler --dist ${ENGINE_DIR}/lite/
+        COMMAND ${LUAC} ${ENGINE_CLI} build --core lite --bundler --dist ${ENGINE_DIR}/lite/
         COMMAND_ERROR_IS_FATAL ANY
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua build --core native --bundler --dist ${ENGINE_DIR}/native/
+        COMMAND ${LUAC} ${ENGINE_CLI} build --core native --bundler --dist ${ENGINE_DIR}/native/
         COMMAND_ERROR_IS_FATAL ANY
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua tool-template-fill ${ENGINE_DIR}/examples/template/game.lua 204800
+        COMMAND ${LUAC} ${ENGINE_CLI} tool-template-fill ${ENGINE_DIR}/examples/template/game.lua 204800
     )
     set(ENGINE "@lite")
 endif()
@@ -140,7 +118,7 @@ if(DEFINED ENGINE)
     get_filename_component(ENGINE "${ENGINE}" ABSOLUTE)
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${ENGINE} ${ENGINE_HEADER} --const --name engine_bytecode_lua
+        COMMAND ${LUAC} ${ENGINE_CLI} fs-xxd-i ${ENGINE} ${ENGINE_HEADER} --const --name engine_bytecode_lua
         COMMAND_ERROR_IS_FATAL ANY
     )
 endif()
@@ -164,7 +142,7 @@ if(DEFINED GAME AND GAME_LENGTH)
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/game")
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua fs-xxd-i ${GAME} ${GAME_HEADER} --const --name game_bytecode_lua
+        COMMAND ${LUAC} ${ENGINE_CLI} fs-xxd-i ${GAME} ${GAME_HEADER} --const --name game_bytecode_lua
         COMMAND_ERROR_IS_FATAL ANY
     )
 endif()
@@ -173,7 +151,7 @@ endif()
 if(LUA_OPTMIZE)
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} src/cli/main.lua fs-luaconf ${LUA_PATH}/luaconf.h --32bits
+        COMMAND ${LUAC} ${ENGINE_CLI} fs-luaconf ${LUA_DIR}/luaconf.h --32bits
     )
 endif()
 

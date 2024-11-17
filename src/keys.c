@@ -16,9 +16,9 @@ static const char *const key_bindings[] = {
     "d"
 };
 
-static void key_update(lua_State* L, const char *const key, uint8_t value)
+static void key_update(lua_State* L, int callback, const char *const key, uint8_t value)
 {
-    lua_getglobal(L, "native_callback_keyboard");
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
     lua_pushstring(L, key);
     lua_pushinteger(L, value);
     lua_pcall(L, 2, 0, 0);
@@ -28,7 +28,7 @@ static void key_update(lua_State* L, const char *const key, uint8_t value)
  * @li 1 released
  * @li 0 pressing
  */
-void keys_callback_update(lua_State* L)
+void keys_callback_update(lua_State* L, int callback)
 {
     uint16_t mask = 1;
     uint8_t i = 0;
@@ -36,10 +36,10 @@ void keys_callback_update(lua_State* L)
 
     while (i < sizeof(key_bindings)) {
         if ((keys_current &~ keys_old) & mask) {
-            key_update(L, key_bindings[i], 0);
+            key_update(L, callback, key_bindings[i], 0);
         }
         else if ((~keys_current &  keys_old) & mask) {
-            key_update(L, key_bindings[i], 1);
+            key_update(L, callback, key_bindings[i], 1);
         }
         mask = mask << 1;
         i = i + 1;

@@ -98,9 +98,9 @@ static int native_draw_image(lua_State *L) {
     return 0;
 }
 
-void draw_callback_update(lua_State* L)
+void draw_callback_update(lua_State* L, int callback)
 {
-    lua_getglobal(L, "native_callback_draw");
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
     lua_pcall(L, 0, 0, 0);
 }
 
