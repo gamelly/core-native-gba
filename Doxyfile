@@ -1,7 +1,7 @@
 # Custom Configs
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Core Native GBA"
-PROJECT_NUMBER         = 0.0.11
+PROJECT_NUMBER         = 0.0.12
 PROJECT_BRIEF          = "create your own game-engine with just lua for nitendo game boy advance console."
 PROJECT_LOGO           = 
 OUTPUT_DIRECTORY       = .
