@@ -81,7 +81,7 @@ add_library(lua-static STATIC ${lua_files})
 find_program(LUAC lua PATHS ${LUA_DIR} REQUIRED NO_DEFAULT_PATH)
 
 # Engine
-set(ENGINE_VERSION "0.0.15")
+set(ENGINE_VERSION "0.0.16")
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
 set(ENGINE_CLI "${ENGINE_DIR}/src/cli/main.lua")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
