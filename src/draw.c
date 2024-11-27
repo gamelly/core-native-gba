@@ -1,7 +1,4 @@
 #include "zeebo.h"
-#include "font/gly_type_render.h"
-
-static uint8_t font_size = 0;
 
 static int native_draw_start(lua_State *L)
 {
@@ -55,39 +52,6 @@ static int native_draw_line(lua_State *L)
     return 0;
 }
 
-static int native_draw_font(lua_State *L)
-{
-    if (lua_gettop(L) == 2) {
-        font_size = luaL_checknumber(L, 2);
-    } else {
-        font_size = luaL_checknumber(L, 1);
-    }
-    lua_settop(L, 0);
-    return 0;
-}
-
-static int native_draw_text(lua_State *L)
-{
-    uint8_t x = luaL_checknumber(L, 1);
-    uint8_t y = luaL_checknumber(L, 2);
-    const char* text = luaL_checkstring(L, 3);
-    gly_type_render(x, y, font_size, text, draw_queue_clojure(51));
-    lua_settop(L, 0);
-    lua_pushnumber(L, 1);
-    lua_pushnumber(L, 1);
-    return 2;
-}
-
-static int native_draw_text_tui(lua_State *L) {
-    uint8_t x = luaL_checknumber(L, 1);
-    uint8_t y = luaL_checknumber(L, 2);
-    uint8_t s = luaL_checknumber(L, 7);
-    const char* text = luaL_checkstring(L, 8);
-    gly_type_render(x * 3, y * 3, s * 5, text, draw_queue_clojure(51));
-    lua_settop(L, 0);
-    return 0;
-}
-
 static int native_draw_image(lua_State *L) {
     uint8_t x = luaL_checknumber(L, 2);
     uint8_t y = luaL_checknumber(L, 3);
@@ -114,9 +78,6 @@ void draw_library_install(lua_State* L)
         {"native_draw_color", native_draw_color},
         {"native_draw_rect", native_draw_rect},
         {"native_draw_line", native_draw_line},
-        {"native_draw_font", native_draw_font},
-        {"native_draw_text", native_draw_text},
-        {"native_draw_text_tui", native_draw_text_tui},
         {"native_draw_image", native_draw_image}
     };
 

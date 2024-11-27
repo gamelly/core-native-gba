@@ -81,7 +81,7 @@ add_library(lua-static STATIC ${lua_files})
 find_program(LUAC lua PATHS ${LUA_DIR} REQUIRED NO_DEFAULT_PATH)
 
 # Engine
-set(ENGINE_VERSION "0.0.12")
+set(ENGINE_VERSION "0.0.15")
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
 set(ENGINE_CLI "${ENGINE_DIR}/src/cli/main.lua")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
@@ -90,7 +90,7 @@ if(NOT EXISTS ${ENGINE_HEADER})
     FetchContent_Populate(dep_engine URL ${ENGINE_DOWNLOAD} SOURCE_DIR ${ENGINE_DIR})
     file(MAKE_DIRECTORY "${ENGINE_DIR}/lite")
     file(MAKE_DIRECTORY "${ENGINE_DIR}/native")
-    file(MAKE_DIRECTORY "${ENGINE_DIR}/examples/template")
+    file(MAKE_DIRECTORY "${ENGINE_DIR}/samples/template")
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
         COMMAND ${LUAC} ${ENGINE_CLI} build --core lite --bundler --dist ${ENGINE_DIR}/lite/
@@ -103,7 +103,7 @@ if(NOT EXISTS ${ENGINE_HEADER})
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} ${ENGINE_CLI} tool-template-fill ${ENGINE_DIR}/examples/template/game.lua 204800
+        COMMAND ${LUAC} ${ENGINE_CLI} tool-template-fill ${ENGINE_DIR}/samples/template/game.lua 204800
     )
     set(ENGINE "@lite")
 endif()
@@ -128,10 +128,10 @@ string(LENGTH "${GAME}" GAME_LENGTH)
 set(GAME_HEADER "${CMAKE_SOURCE_DIR}/vendor/game/bytecode.h")
 if (DEFINED GAME AND GAME_LENGTH AND GAME MATCHES "^\\@")
     string(SUBSTRING "${GAME}" 1 -1 GAME)
-    set(GAME "${ENGINE_DIR}/examples/${GAME}/game.lua")
+    set(GAME "${ENGINE_DIR}/samples/${GAME}/game.lua")
 endif()
 if ((NOT DEFINED GAME AND NOT EXISTS ${GAME_HEADER}) OR (DEFINED GAME AND NOT GAME_LENGTH))
-    set(GAME "${ENGINE_DIR}/examples/template/game.lua")
+    set(GAME "${ENGINE_DIR}/samples/template/game.lua")
     set(GAME_LENGTH 1)
 endif()
 if(DEFINED GAME AND GAME_LENGTH)
