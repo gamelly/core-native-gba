@@ -18,6 +18,7 @@ int main()
     lua_State *L;
     L = luaL_newstate();
     luaL_openlibs(L);
+    text_library_install(L);
     draw_library_install(L);
 
     luaL_loadbuffer(L, engine_bytecode_lua, engine_bytecode_lua_len, "");
