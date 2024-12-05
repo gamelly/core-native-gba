@@ -31,7 +31,10 @@ static int native_text_mensure(lua_State *L)
 static int native_text_font_size(lua_State *L)
 {
     previous_font_size = font_size;
-    font_size = luaL_checknumber(L, 1);
+    font_size = luaL_checknumber(L, 1) - 1;
+    if (font_size < 3) {
+        font_size = 3;
+    }
     lua_settop(L, 0);
     return 0;
 }
