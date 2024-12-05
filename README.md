@@ -6,8 +6,8 @@ This project is a basic micro-gameengine to run lua in the **Nintendo Game Boy A
 which can be expanded to a custom engine, such as [Gly Engine](https://github.com/gamelly/gly-engine).
 
  * [online ide](https://playground.gamely.com.br)
- * [limitations](https://docs.gamely.com.br/a00232#limits-in-gameboy-advanced)
- * [documentation](https://docs.gamely.com.br/a00188.html)
+ * [limitations](https://docs.gamely.com.br/limits#limits-in-gameboy-advanced)
+ * [documentation](https://docs.gamely.com.br/group__homebrew#nintendo_gba)
 
 <br/>
 
