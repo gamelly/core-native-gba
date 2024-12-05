@@ -10,13 +10,13 @@ uint8_t draw_mode;
 void draw_cmd_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     if (draw_mode != 3) {
-        tint.c16.color.r = r;
-        tint.c16.color.g = g;
-        tint.c16.color.b = b;
+        tint.c16.color.r = r>>3;
+        tint.c16.color.g = g>>3;
+        tint.c16.color.b = b>>3;
     } else {
-        clear.c16.color.r = r;
-        clear.c16.color.g = g;
-        clear.c16.color.b = b;
+        clear.c16.color.r = r>>3;
+        clear.c16.color.g = g>>3;
+        clear.c16.color.b = b>>3;
     }
 
     if (flush_mode) {

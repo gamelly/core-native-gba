@@ -13,9 +13,9 @@ typedef union {
     uint16_t arr[2];
     struct {
         struct {
-            uint16_t b: 5; 
-            uint16_t g: 5; 
             uint16_t r: 5;
+            uint16_t g: 5; 
+            uint16_t b: 5; 
             uint16_t a: 1;
         } color;
     } c16;
