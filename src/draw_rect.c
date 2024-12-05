@@ -2,6 +2,14 @@
 
 void draw_cmd_rect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
+    if ((x + w) > 240)  {
+        w = 240 - x;
+    }
+
+    if ((y + h) > 160)  {
+        h = 160 - y;
+    }
+
     if (draw_mode) {
         for (int i = 0; i < w; i++) {
             *(uint16_t *)(0x06000000 + ((y) * 240 + (x + i)) * 2) = draw_color.pixel;
