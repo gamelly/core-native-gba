@@ -43,7 +43,8 @@ void draw_queue_page(uint8_t page);
 void draw_queue_push(uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 cmd_t draw_queue_clojure(uint8_t cmd);
 
-uint8_t geoclip_rect(int32_t *posx, int32_t *posy, int32_t *width, int32_t *height);
+uint8_t geoclip_line(int32_t *, int32_t *, int32_t *, int32_t *);
+uint8_t geoclip_rect(int32_t *, int32_t *, int32_t *, int32_t *);
 
 void text_library_install(lua_State* L);
 void draw_library_install(lua_State* L);

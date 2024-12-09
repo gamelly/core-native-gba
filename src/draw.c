@@ -47,11 +47,15 @@ static int native_draw_rect(lua_State *L)
 
 static int native_draw_line(lua_State *L)
 {
-    uint8_t x1 = luaL_checknumber(L, 1);
-    uint8_t y1 = luaL_checknumber(L, 2);
-    uint8_t x2 = luaL_checknumber(L, 3);
-    uint8_t y2 = luaL_checknumber(L, 4);
-    draw_queue_push(51, x1, y1, x2, y2);
+    int32_t x1 = luaL_checknumber(L, 1);
+    int32_t y1 = luaL_checknumber(L, 2);
+    int32_t x2 = luaL_checknumber(L, 3);
+    int32_t y2 = luaL_checknumber(L, 4);
+
+    if (geoclip_line(&x1, &y1, &x2, &y2)) {
+        draw_queue_push(51, (uint8_t) x1, (uint8_t) y1, (uint8_t) x2, (uint8_t) y2);
+    }
+
     lua_settop(L, 0);
     return 0;
 }
