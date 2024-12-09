@@ -20,7 +20,7 @@ void draw_logo()
     gly_type_render(95, 67, 5, "native", draw_queue_clojure(51));
 #endif
     gly_type_render(95, 74, 5, "engine", draw_queue_clojure(51));
-    gly_type_render(97, 80, 4, "0.0.16", draw_queue_clojure(51));
+    gly_type_render(97, 80, 4, "0.0.17", draw_queue_clojure(51));
     draw_queue_burn(1);
 #endif
 }
