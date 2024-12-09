@@ -50,3 +50,5 @@ void draw_library_install(lua_State* L);
 void draw_callback_update(lua_State* L, int);
 void keys_callback_update(lua_State *L, int);
 void loop_callback_update(lua_State* L, int, uint8_t dt);
+
+void runtime(lua_State* L);
