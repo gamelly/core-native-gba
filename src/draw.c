@@ -31,12 +31,16 @@ static int native_draw_color(lua_State *L)
 static int native_draw_rect(lua_State *L)
 {
     uint8_t mode = luaL_checkinteger(L, 1);
-    uint8_t posx = luaL_checknumber(L, 2);
-    uint8_t posy = luaL_checknumber(L, 3);
-    uint8_t width = luaL_checknumber(L, 4);
-    uint8_t height = luaL_checknumber(L, 5);
-    draw_queue_push(48, mode, 0, 1, 0);
-    draw_queue_push(50, posx, posy, width, height);
+    int32_t posx = luaL_checknumber(L, 2);
+    int32_t posy = luaL_checknumber(L, 3);
+    int32_t width = luaL_checknumber(L, 4);
+    int32_t height = luaL_checknumber(L, 5);
+
+    if (geoclip_rect(&posx, &posy, &width, &height)) {
+        draw_queue_push(48, mode, 0, 1, 0);
+        draw_queue_push(50, (uint8_t) posx, (uint8_t) posy, (uint8_t) width, (uint8_t) height);
+    }
+
     lua_settop(L, 0);
     return 0;
 }
