@@ -21,14 +21,14 @@ int main()
     text_library_install(L);
     draw_library_install(L);
 
-    luaL_loadbuffer(L, engine_bytecode_lua, engine_bytecode_lua_len, "");
+    luaL_loadbuffer(L, engine_bytecode_lua, engine_bytecode_lua_len, "E");
 	lua_pcall(L, 0, 0, 0);
 
     lua_getglobal(L, "native_callback_init");
     lua_pushnumber(L, 240);
     lua_pushnumber(L, 160);
 
-    luaL_loadbuffer(L, game_bytecode_lua, game_bytecode_lua_len, "");
+    luaL_loadbuffer(L, game_bytecode_lua, game_bytecode_lua_len, "G");
 	lua_pcall(L, 0, 1, 0);
     lua_pcall(L, 3, 0, 0);
 
