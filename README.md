@@ -3,7 +3,7 @@
 [<img align="right" height="168px" src="https://raw.githubusercontent.com/RodrigoDornelles/RodrigoDornelles/refs/heads/master/media/pong-gba-gly-engine.gif">](#core-native-gba)
 
 This project is a basic micro-gameengine to run lua in the **Nintendo Game Boy Advanced**,
-which can be expanded to a custom engine, such as [Gly Engine](https://github.com/gamelly/gly-engine).
+which can be expanded to a custom engine, such as [Gly Engine](https://github.com/gamelly/gly-engine) or [Love2d](https://github.com/gamelly/love-engine).
 
  * [online ide](https://playground.gamely.com.br)
  * [limitations](https://docs.gamely.com.br/limits#limits-in-gameboy-advanced)
