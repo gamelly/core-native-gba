@@ -80,6 +80,16 @@ list(REMOVE_ITEM lua_files "${LUA_DIR}/onelua.c")
 add_library(lua-static STATIC ${lua_files})
 find_program(LUAC lua PATHS ${LUA_DIR} REQUIRED NO_DEFAULT_PATH)
 
+# Loading / Splash Screen
+if(DEFINED ENGINE AND ENGINE STREQUAL "@love")
+    set(ENGINE_LOGO 2 CACHE STRING "" FORCE)
+elseif(DEFINED ENGINE AND ENGINE MATCHES "^\\@")
+    set(ENGINE_LOGO 1 CACHE STRING "" FORCE)
+else()
+    set(ENGINE_LOGO 3 CACHE STRING "" FORCE)
+endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_LOGO=${ENGINE_LOGO})
+
 # Engine
 set(ENGINE_VERSION "0.0.16")
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")

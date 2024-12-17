@@ -1,7 +1,7 @@
 #include "zeebo.h"
 
 #ifndef ENGINE_LOGO
-#define ENGINE_LOGO 1
+#error splash screen is not configurated!
 #endif
 
 extern void gly_type_render(uint8_t, uint8_t, uint8_t, char*, void*);
@@ -31,7 +31,7 @@ void draw_logo()
     draw_queue_push(48, 1, 0, 1, 0);
     draw_queue_push(49, 0xFF, 0xFF, 0xFF, 0);
     gly_type_render(95, 56, 12, "gly", draw_queue_clojure(51));
-    gly_type_render(95, 73, 5, "engine", draw_queue_clojure(51));
+    gly_type_render(95, 72, 5, "engine", draw_queue_clojure(51));
     draw_queue_push(50, 90, 45, 50, 45);
 #elif ENGINE_LOGO == 2
     static const uint8_t ver_x = 97;
