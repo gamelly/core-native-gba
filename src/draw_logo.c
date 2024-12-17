@@ -10,14 +10,28 @@ void draw_logo()
 {
 #if ENGINE_LOGO > 0
     draw_queue_page(1);
-    draw_queue_push(49, 0xFF, 0xFF, 0xFF, 0);
     draw_queue_push(48, 3, 0, 1, 0);
     draw_queue_push(49, 0, 0, 0, 0);
 #if ENGINE_LOGO == 1
     static const uint8_t ver_x = 97;
     static const uint8_t ver_y = 80;
-    gly_type_render(95, 60, 12, "gly", draw_queue_clojure(51));
-    gly_type_render(95, 74, 5, "engine", draw_queue_clojure(51));
+    draw_queue_push(48, 0, 0, 1, 0);
+    draw_queue_push(49, 0x00, 0x00, 0xFF, 0);
+    draw_queue_push(50, 90, 45, 50, 15);
+    draw_queue_push(49, 0x00, 0xFF, 0x67, 0);
+    draw_queue_push(50, 90, 45+15, 50, 5);
+    draw_queue_push(49, 0xFF, 0xe7, 0x00, 0);
+    draw_queue_push(50, 90, 45+20, 50, 5);
+    draw_queue_push(49, 0xFF, 0x76, 0x00, 0);
+    draw_queue_push(50, 90, 45+25, 50, 5);
+    draw_queue_push(49, 0xFF, 0x00, 0x00, 0);
+    draw_queue_push(50, 90, 45+30, 50, 5);
+    draw_queue_push(49, 0xFF, 0x00, 0xFF, 0);
+    draw_queue_push(50, 90, 45+35, 50, 10);
+    draw_queue_push(48, 1, 0, 1, 0);
+    draw_queue_push(49, 0xFF, 0xFF, 0xFF, 0);
+    gly_type_render(95, 56, 12, "gly", draw_queue_clojure(51));
+    gly_type_render(95, 73, 5, "engine", draw_queue_clojure(51));
     draw_queue_push(50, 90, 45, 50, 45);
 #elif ENGINE_LOGO == 2
     static const uint8_t ver_x = 97;
