@@ -178,5 +178,10 @@ if(LUA_OPTMIZE)
     )
 endif()
 
+# CFGs
+if(DEFINED FPS_MODE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE FPS_MODE=${FPS_MODE})
+endif()
+
 target_link_libraries(${PROJECT_NAME} lua-static)
 target_link_libraries(${PROJECT_NAME} m)

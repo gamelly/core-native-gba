@@ -1,7 +1,7 @@
 #include "zeebo.h"
 
 #ifndef ENGINE_LOGO
-#error splash screen is not configurated!
+#error invalid ENGINE_LOGO
 #endif
 
 extern void gly_type_render(uint8_t, uint8_t, uint8_t, char*, void*);

@@ -124,5 +124,7 @@ void runtime(lua_State* L)
         while(*(volatile uint16_t*) 0x04000006 >= 160);
         while(*(volatile uint16_t*) 0x04000006 < 160);
     }
+#else
+#error invalid FPS_MODE
 #endif
 }
