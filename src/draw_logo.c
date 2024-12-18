@@ -4,6 +4,9 @@
 #error invalid ENGINE_LOGO
 #endif
 
+/**
+ * https://github.com/gamelly/gly-type
+ */
 extern void gly_type_render(uint8_t, uint8_t, uint8_t, char*, void*);
 
 void draw_logo()
