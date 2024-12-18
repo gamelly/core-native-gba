@@ -13,9 +13,9 @@ typedef union {
     uint16_t arr[2];
     struct {
         struct {
-            uint16_t b: 5; 
-            uint16_t g: 5; 
             uint16_t r: 5;
+            uint16_t g: 5; 
+            uint16_t b: 5; 
             uint16_t a: 1;
         } color;
     } c16;
@@ -43,8 +43,13 @@ void draw_queue_page(uint8_t page);
 void draw_queue_push(uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 cmd_t draw_queue_clojure(uint8_t cmd);
 
+uint8_t geoclip_line(int32_t *, int32_t *, int32_t *, int32_t *);
+uint8_t geoclip_rect(int32_t *, int32_t *, int32_t *, int32_t *);
+
 void text_library_install(lua_State* L);
 void draw_library_install(lua_State* L);
 void draw_callback_update(lua_State* L, int);
 void keys_callback_update(lua_State *L, int);
 void loop_callback_update(lua_State* L, int, uint8_t dt);
+
+void runtime(lua_State* L);
