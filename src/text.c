@@ -10,6 +10,11 @@ static int native_text_mock(lua_State *L)
     return 0;
 }
 
+/**
+ * @param[in] x @c double
+ * @param[in] y @c double
+ * @param[in] message @c string
+ */
 static int native_text_print(lua_State *L)
 {
     uint8_t x = luaL_checknumber(L, 1);
@@ -20,6 +25,11 @@ static int native_text_print(lua_State *L)
     return 2;
 }
 
+/**
+ * @param[in] message @c string
+ * @retval width @c double
+ * @retval height @c double
+ */
 static int native_text_mensure(lua_State *L)
 {
     lua_settop(L, 0);
@@ -28,6 +38,9 @@ static int native_text_mensure(lua_State *L)
     return 2;
 }
 
+/**
+ * @param[in] size @c int
+ */
 static int native_text_font_size(lua_State *L)
 {
     previous_font_size = font_size;
