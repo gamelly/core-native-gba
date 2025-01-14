@@ -15,8 +15,8 @@ void draw_cmd_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
         dy = -dy;
     }
 
-    uint16_t *dst = (uint16_t *)(0x06000000 + (y1 * 240 + x1) * 2);
-    int dstPitch = 240;
+    uint16_t *dst = (uint16_t *)(((uint16_t*) 0x6800000) + (y1 * 256 + x1));
+    int dstPitch = 256;
 
     if (dx >= dy) {
         dd = 2 * dy - dx;

@@ -20,12 +20,12 @@ uint8_t geoclip_rect(int32_t *posx, int32_t *posy, int32_t *width, int32_t *heig
         *posy = 0;
     }
 
-    if ((*posx + *width) > 240) {
-        *width = 240 - *posx;
+    if ((*posx + *width) > 256) {
+        *width = 256 - *posx;
     }
 
-    if ((*posy + *height) > 160) {
-        *height = 160 - *posy;
+    if ((*posy + *height) > 192) {
+        *height = 192 - *posy;
     }
 
     if (*width < 0) {
