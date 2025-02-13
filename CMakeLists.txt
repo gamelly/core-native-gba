@@ -53,7 +53,7 @@ endif()
 find_program(ZIGC zig PATHS ${ZIG_DIR} REQUIRED NO_DEFAULT_PATH)
 
 # Font
-set(FONT_VERSION "0.1")
+set(FONT_VERSION "0.2.1")
 set(FONT_DIR "${CMAKE_SOURCE_DIR}/vendor/font")
 set(FONT_DOWNLOAD "https://github.com/gamelly/gly-type/archive/refs/tags/${FONT_VERSION}.tar.gz")
 if(NOT EXISTS ${FONT_DIR})
