@@ -65,7 +65,7 @@ set(LUA_VERSION "5.4.7")
 set(LUA_DIR "${CMAKE_SOURCE_DIR}/vendor/lua")
 set(LUA_DOWNLOAD "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz")
 set(LUA_OPTMIZE FALSE)
-if(NOT EXISTS "${LUA_PATH}/lua")
+if(NOT EXISTS "${LUA_DIR}/lua")
     set(LUA_OPTMIZE TRUE)
     FetchContent_Populate(dep_lua URL "${LUA_DOWNLOAD}" SOURCE_DIR ${LUA_DIR})
     execute_process(
@@ -91,7 +91,7 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_LOGO=${ENGINE_LOGO})
 
 # Engine
-set(ENGINE_VERSION "0.0.17")
+set(ENGINE_VERSION "0.0.18")
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
 set(ENGINE_CLI "${ENGINE_DIR}/src/cli/main.lua")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
