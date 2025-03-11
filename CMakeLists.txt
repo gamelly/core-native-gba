@@ -91,14 +91,15 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_LOGO=${ENGINE_LOGO})
 
 # Engine
-set(ENGINE_VERSION "0.0.18")
+set(ENGINE_VERSION "0.0.19")
 set(ENGINE_DIR "${CMAKE_SOURCE_DIR}/vendor/engine")
 set(ENGINE_CLI "${ENGINE_DIR}/src/cli/main.lua")
 set(ENGINE_DOWNLOAD "https://github.com/gamelly/gly-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
 set(ENGINE_HEADER "${ENGINE_DIR}/bytecode.h")
+set(ENGINE_LOVE_VERSION "0.0.17")
 set(ENGINE_LOVE_DIR1 "${ENGINE_DIR}/love")
 set(ENGINE_LOVE_DIR2 "${CMAKE_SOURCE_DIR}/vendor/love")
-set(ENGINE_LOVE_DOWNLOAD "https://github.com/gamelly/love-engine/archive/refs/tags/${ENGINE_VERSION}.tar.gz")
+set(ENGINE_LOVE_DOWNLOAD "https://github.com/gamelly/love-engine/archive/refs/tags/${ENGINE_LOVE_VERSION}.tar.gz")
 if(NOT EXISTS ${ENGINE_HEADER})
     FetchContent_Populate(dep_engine URL ${ENGINE_DOWNLOAD} SOURCE_DIR ${ENGINE_DIR})
     file(MAKE_DIRECTORY "${ENGINE_DIR}/lite")
@@ -117,7 +118,7 @@ if(NOT EXISTS ${ENGINE_HEADER})
     )
     execute_process(
         WORKING_DIRECTORY ${ENGINE_DIR}
-        COMMAND ${LUAC} ${ENGINE_CLI} tool-template-fill ${ENGINE_DIR}/samples/template/game.lua 204800
+        COMMAND ${LUAC} ${ENGINE_CLI} tool-template-fill ${ENGINE_DIR}/samples/template/game.lua 100000
     )
     if (NOT DEFINED ENGINE)
         set(ENGINE "@lite")
