@@ -58,7 +58,7 @@ void draw_logo()
     gly_type_render(95, 60, 13, "CORE", draw_queue_clojure(51));
     gly_type_render(95, 74, 5, "Native", draw_queue_clojure(51));
 #endif
-    gly_type_render(ver_x, ver_y, 5, "0.0.18", draw_queue_clojure(51));
+    gly_type_render(ver_x, ver_y, 5, "0.0.19", draw_queue_clojure(51));
     draw_queue_burn(1);
 #endif
 }
